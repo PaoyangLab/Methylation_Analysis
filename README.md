@@ -46,7 +46,7 @@ docker pull peiyulin/methylc:V1.0
 
 > For these tools, you can download them through `wget` command and install them by following the instructions in their manuals.
 ```bash
-wget  <TOOL_URL> 
+wget <TOOL_URL> 
 ```
 
 ---
@@ -77,7 +77,7 @@ Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illu
 
 ## 3. Analysis Pipeline
 
-The bioinformatics pipeline of methylation analysis is introduced below. In the following demonstration.
+The bioinformatics pipeline of methylation analysis is introduced below, including Processing methylomes, DMR identification, Data visualization and Post-alignment analyses.
 
 ![overall_pipeline.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/overall_pipeline.png)
 
@@ -116,9 +116,11 @@ Each CpG site contains the following information: chromosome, nucleotide on Wats
 In regard to methyl-seq (EM-seq and BS-seq) analysis, the estimation conversion rate, which measures how effectively bisulfite or enzyme treatment can convert 
 unmethylated cytosines to uracil in DNA samples, is required for evaluation. By 
 comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines (#𝑇)** by the **total number of cytosines (#𝑇 + C)** and multiplying by 100. 
+
 $$
 \text{Conversion rate} = \frac{\#T}{\#T + \#C} \times 100
 $$
+
 Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
 
 1. The first step for the conversion rate is the same as above but changes the in-put reference genome to the lambda phage genome `lambda_genome.fa`.
@@ -135,7 +137,7 @@ bs_seeker2-call_methylation.py -i wt_r1_lambda.bam -o wt_r1_lambda -d BS2_bt2_In
 ```bash
 Rscript coversion_rate.R  wt_r1_lambda.CGmap.gz
 ```
-> output will look like:
+> The output will look like:
 ```bash
 [ 03:13:46 AM ] Calculating bisulfite conversion rate
 [ 03:13:46 AM ] Bisulfite conversion rate: 97.01493 %
@@ -166,19 +168,21 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 
 The output consists of all, hyper, and hypo DMRs as text files. Here, we found **3,282 DMRs** in CG methylation between the wt and met1 groups. 
 
-### 3.3	Data visualization
+### 3.3 Data visualization
 #### 3.3.1	Genome browser
+
 ![IGV_tutorial 1.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/IGV_tutorial.png)
 
 1.	Download and activate the IGV Desktop application according to the operat-ing system. This application supports operating systems includ-ing MacOS, Windows, and Linux.
 2.	Select the reference genome from the dropdown list. Here, we chose A. thali-ana (TAIR10) as a reference genome. Additional reference genomes can be downloaded by clicking More or can be loaded from the local path (in FASTA format).
-3.	Convert the file from the WIG file to the suggested track formats, BigWig or TDF files, by running IGVtools (Click Tools>Run IGVtools).
-4.	Select File>Load from File to load data into the track panel. Right-click the panel to adjust the graphic type or other settings.
-5.	Use the dropdown list and search box at the top panel to select the chromo-some and region shown. Click +/- on the top panel to zoom in/out. Clicking or dragging on the track of the chromosome can also adjust the region shown.
-6.	Click File>Save session or File>Save Image to save the visualization result.
+3.	Convert the file from the WIG file to the suggested track formats, BigWig or TDF files, by running IGVtools (Click `Tools`>`Run IGVtools`).
+4.	Select `File`>`Load from File` to load data into the track panel. Right-click the panel to adjust the graphic type or other settings.
+5.	Use the dropdown list and search box at the top panel to select the chromo-some and region shown. Click `+`/`-` on the top panel to zoom in/out. Clicking or dragging on the track of the chromosome can also adjust the region shown.
+6.	Click `File`>`Save session or File`>`Save Image` to save the visualization result.
 
-### 3.4	Post-alignment analyses
+### 3.4 Post-alignment analyses
 MethylC-analyzer provide several post-alignment analyses. Here, we implement the enrichment analysis and metagene analysis as example.
+
 ![methylC_tutorial.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/methylC_tutorial.png)
 #### 3.4.1 Enrichment analysis
 Use the `Fold_Enrichment` command to generate the enrichment result. 
@@ -189,6 +193,7 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 ```
 
 DMRs exhibit a positive fold enrichment value in the IGR, suggesting a higher likelihood of DMRs being located in IGRs.
+
 ![CG_Fold_Enrichment.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CG_Fold_Enrichment.png)
 
 #### 3.4.2 Metagene analysis
@@ -200,4 +205,5 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 ```
 
 In our case, the wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
+
 ![metaplot_CG.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/metaplot_CG.png)
