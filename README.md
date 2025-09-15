@@ -118,8 +118,9 @@ unmethylated cytosines to uracil in DNA samples, is required for evaluation. By
 comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines (#𝑇)** by the **total number of cytosines (#𝑇 + C)** and multiplying by 100. 
 
 $$
-\text{Conversion rate} = \frac{\#T}{\#T + \#C} \times 100
+\text{Conversion rate} = \frac{\text{\#}T}{\text{\#}T + \text{\#}C} \times 100\%
 $$
+
 
 Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
 
@@ -194,7 +195,7 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 
 DMRs exhibit a positive fold enrichment value in the IGR, suggesting a higher likelihood of DMRs being located in IGRs.
 
-![CG_Fold_Enrichment.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CG_Fold_Enrichment.png)
+<img src="https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CG_Fold_Enrichment.png" width="400">
 
 #### 3.4.2 Metagene analysis
  Use the `Metaplot` command to generate the Metaplot result. This module generates two types of metagene plots: one represents the average methylation level in two groups (metaplot_CG.pdf), and the other shows the difference 
@@ -206,4 +207,5 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 
 In our case, the wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
 
-![metaplot_CG.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/metaplot_CG.png)
+<img src="https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
+
