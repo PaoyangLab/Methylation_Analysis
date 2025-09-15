@@ -10,13 +10,13 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 
 ## Table of Contents
 
-- [Installation](#1-tools-installation)
-- [Download Example Data](#2-download-example-data)
-- [Analysis Pipeline](#3-analysis-pipeline)
-	- Processing methylomes
-	- DMR identification
-	- Data visualization
-	- Post-alignment analyses
+- [1. Installation](#1-tools-installation)
+- [2. Download Example Data](#2-download-example-data)
+- [3. Analysis Pipeline](#3-analysis-pipeline)
+	- [3.1 Processing methylomes](#31-processing-methylomes)
+	- [3.2 DMR identification](#32-dmr-identification)
+	- [3.3 Data visualization](#33-data-visualization)
+	- [3.4 Post-alignment analyses](#34-post-alignment-analyses)
 
 ---
 
@@ -27,15 +27,27 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 - [BS-Seeker2 v2.0.8](https://github.com/BSSeeker/BSseeker2)  
 - [HOME v1.0.0](https://github.com/ListerLab/HOME)  
 - [MethylC-analyzer](https://github.com/RitataLU/MethylC-analyzer)  
-	For MethylC-analyzer, docker image is recommended to avoid enveioment conflict
-		```bash
-		docker pull peiyulin/methylc:V1.0
-		```
+
+> For the github tools, please download the repository through `clone` command and install them by following the instructions in their manuals.
+```bash
+git clone <GITHUB_URL> 
+```
+
+> For MethylC-analyzer, docker image is recommended to avoid environment conflict
+```bash
+docker pull peiyulin/methylc:V1.0
+```
+
 ###  From Other Sites 
 - [Bowtie2 v2.26](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)  
 - [bicycle v1.8.2](http://www.sing-group.org/bicycle)  
 - [IGV Desktop v2.16.0](https://igv.org/)  
 - [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/)  
+
+> For these tools, you can download them through `wget` command and install them by following the instructions in their manuals.
+```bash
+wget  <TOOL_URL> 
+```
 
 ---
 
@@ -43,10 +55,20 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 
 We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset (GSE122394) from GEO, including wild-type (wt) strains as controls and *met1* mutant strains in which DNA methyltransferase 1 (MET1) functions primarily to maintain CG methylation. Each group (wild-type, met1 mutant) contains **three biological replicates**.  
 
-To obtain the data, you can use SRA Toolkit to download the file using `prefetch` and then convert it into the FASTQ format (.fastq) for analysis by `fast-dump`.
+|Name|SRA|Type|
+|----|---|----|
+|wt_r1|SRR8180314|Wild type|
+|wt_r2|SRR8180315|Wild type|
+|wt_r3|SRR8180316|Wild type|
+|met1_r1|SRR8180322|MET1 mutant|
+|met1_r2|SRR8180323|MET1 mutant|
+|met1_r3|SRR8180324|MET1 mutant|
+
+To obtain the data, you can use SRA Toolkit to download the file by `prefetch` and then convert it into the FASTQ format (.fastq) for analysis by `fast-dump`.
+
 ```bash
-prefetch SRR8180314
-fastq-dump SRR8180314
+prefetch <SRA_ID> ## download SRA data
+fastq-dump <SRA_ID> ## transfer into fastq file 
 ```
 
 Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html).
@@ -55,24 +77,28 @@ Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illu
 
 ## 3. Analysis Pipeline
 
-To provide useful guidance, a bioinformatics pipeline is introduced below. In the following demonstration, BS-Seeker2 is used for alignment and call methylation.
+The bioinformatics pipeline of methylation analysis is introduced below. In the following demonstration.
 
 ![overall_pipeline.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/overall_pipeline.png)
 
 ### 3.1 Processing methylomes
+Here, BS-Seeker2 is used for alignment and call methylation and replicate 1 of wildtype sample is implemented as example.
 #### 3.1.1 Alignments of methyl-seq read
-1. Use bowtie2 to create a reference genome index file (see Note 1). for the Ar-abidopsis thaliana TAIR10 version in the aligner and save it as `BS2_bt2_Index`.
+1. Use bowtie2 to create a reference genome index file (Arabidopsis thaliana TAIR10 version) for the aligner. 
+> 	The `-f` specify the FASTA file of reference genome `genome.fa`, which can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). The `-d` specify the directory to save output index file.
 ```bash
 bs_seeker2-build.py -f genome.fa --aligner=bowtie2 -d ./BS2_bt2_Index
 ```
 
-2. Align raw reads of wild-type replicate 1 to the reference genome using the align function and save it as a BAM file named `wt_r1_align.bam`.
+2. Align raw reads of wild-type replicate 1 to the reference genome.
+> 	The `-i` specify input FASTQ file of WT replicate 1 `wt_r1.fastq`, which is obtained from [Step 2](#2-download-example-data); the `-g` specify reference genome `genome.fa` obtained from previous step; and `-o` specify output BAM file named `wt_r1_align.bam`.
 ```bash
 bs_seeker2-align.py -i wt_r1.fastq -g genome.fa  --aligner=bowtie2 -o wt_r1_align.bam
 ```
 
 #### 3.1.2 Call methylation
-1. Use call methylation script to calculate the methylation level.
+1. Use call methylation function to calculate the methylation level. 
+> 	Input BAM file `wt_r1_align.bam` are obtained from [Step 3.1.1](#311-alignments-of-methyl-seq-read). Output file is saved as a CGmap file nemed `wt_r1.CGmap`. The `-d` parameter is used to specify the index file of reference genome .
 ```bash
 bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1.CGmap -d ./BS2_bt2_Index/genome.fa_bowtie2
 ```
@@ -87,7 +113,15 @@ Each CpG site contains the following information: chromosome, nucleotide on Wats
 ![CpGmap_table.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CpGmap_table.png)
 
 #### 3.1.3 Conversion rate
-1. The first step for the conversion rate is the same as above but changes the in-put reference genome to the lambda genome.
+In regard to methyl-seq (EM-seq and BS-seq) analysis, the estimation conversion rate, which measures how effectively bisulfite or enzyme treatment can convert 
+unmethylated cytosines to uracil in DNA samples, is required for evaluation. By 
+comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines (#𝑇)** by the **total number of cytosines (#𝑇 + C)** and multiplying by 100. 
+$$
+\text{Conversion rate} = \frac{\#T}{\#T + \#C} \times 100
+$$
+Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
+
+1. The first step for the conversion rate is the same as above but changes the in-put reference genome to the lambda phage genome `lambda_genome.fa`.
 ```bash
 bs_seeker2-build.py -f lambda_genome.fa --aligner=bowtie2 -d ./BS2_lambda_Index
 
@@ -96,12 +130,13 @@ bs_seeker2-align.py -i wt_r1_rmdup.fastq -g lambda_genome.fa  --aligner=bowtie2 
 bs_seeker2-call_methylation.py -i wt_r1_lambda.bam -o wt_r1_lambda -d BS2_bt2_Index/genome.fa_bowtie2/
 ```
 
-2. The conversion rate is calculated by the R script (see Note 3) with the formula
+2. The conversion rate is calculated by the R script with the formula. 
+> 	The script [coversion_rate.R ](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/coversion_rate.R) is included in this repository.
 ```bash
 Rscript coversion_rate.R  wt_r1_lambda.CGmap.gz
 ```
+> output will look like:
 ```bash
-# output will look like:
 [ 03:13:46 AM ] Calculating bisulfite conversion rate
 [ 03:13:46 AM ] Bisulfite conversion rate: 97.01493 %
 ```
@@ -112,17 +147,19 @@ In our example, the conversion rate for the wt_r1 methylome is 97.01%, which mea
 Here, MethylC-analyzer is selected to demonstrate how to find DMRs from the aligned methylation data output. To prevent environmental conflicts, the docker image provided by the software is utilized
 #### 3.2.1 Searching DMR
 1. Prepare input files 
-	- CGmaps (samples_list.txt): obtained from Step 3.1.2
-	```bash
-	wt_r1.CGmap.gz
-	wt_r2.CGmap.gz
-	wt_r3.CGmap.gz
-	met1_r1.CGmap.gz
-	met1_r2.CGmap.gz
-	met1_r3.CGmap.gz
-	```
-	- GTF files (gene.gtf): downloaded from UCSC (https://hgdownload.soe.ucsc.edu/downloads.html)
-2. The default minimum depth for CpG sites and the number of sites within a region are both set to four. The default size of the DMR is 500 base pairs (bp). The default p value cutoff for Student’s t-test for identifying DMRs is 0.05. These arguments can be adjusted by users. 
+	- List CGmaps into TXT file `samples_list.txt` (obtained from [Step 3.1.2](#312-call-methylation))
+		```bash
+		wt_r1.CGmap.gz
+		wt_r2.CGmap.gz
+		wt_r3.CGmap.gz
+		met1_r1.CGmap.gz
+		met1_r2.CGmap.gz
+		met1_r3.CGmap.gz
+		```
+	- Gene annotation GTF files `gene.gtf` can be downloaded from UCSC (https://hgdownload.soe.ucsc.edu/downloads.html), and it is a file format containing information about the genomic features of genes, such as exons, introns, coding sequences, and untranslated regions (UTRs).
+
+2. Run MethylC-analyzer to identify the DMRs
+> 	The default minimum depth for CpG sites and the number of sites within a region are both set to **4**. The default size of the DMR is **500 base pairs (bp)**. The default p value cutoff for Student’s t-test for identifying DMRs is **P<0.05**. These arguments can be adjusted by users. The `-a` and `-b` specify the group names.
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMR samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
@@ -141,6 +178,7 @@ The output consists of all, hyper, and hypo DMRs as text files. Here, we found *
 6.	Click File>Save session or File>Save Image to save the visualization result.
 
 ### 3.4	Post-alignment analyses
+MethylC-analyzer provide several post-alignment analyses. Here, we implement the enrichment analysis and metagene analysis as example.
 ![methylC_tutorial.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/methylC_tutorial.png)
 #### 3.4.1 Enrichment analysis
 Use the `Fold_Enrichment` command to generate the enrichment result. 
@@ -151,6 +189,7 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 ```
 
 DMRs exhibit a positive fold enrichment value in the IGR, suggesting a higher likelihood of DMRs being located in IGRs.
+![CG_Fold_Enrichment.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CG_Fold_Enrichment.png)
 
 #### 3.4.2 Metagene analysis
  Use the `Metaplot` command to generate the Metaplot result. This module generates two types of metagene plots: one represents the average methylation level in two groups (metaplot_CG.pdf), and the other shows the difference 
@@ -160,4 +199,5 @@ between the two groups (metaplot_delta_CG.pdf). The former illustrates the methy
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b mt
 ```
 
-In our case, the wt samples exhibit a standard CG methylation pattern [41] with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
+In our case, the wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
+![metaplot_CG.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/metaplot_CG.png)
