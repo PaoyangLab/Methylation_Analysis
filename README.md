@@ -108,18 +108,19 @@ bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1.CGmap -d ./BS2_bt2_In
 zless wt_r1.CGmap.gz
 ```
 
-Each CpG site contains the following information: chromosome, nucleotide on Watson strand, position, context, dinucleotide context, methylation level, number of methylated cytosines (#C), and the total number of all cytosines (#C+T)
+Each CpG site contains the following information: chromosome, nucleotide on Watson strand, position, context, dinucleotide context, methylation level, number of methylated cytosines ($N_C$), and the total number of all cytosines ($N_T$+$N_C$)
 
 ![CpGmap_table.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CpGmap_table.png)
 
 #### 3.1.3 Conversion rate
 In regard to methyl-seq (EM-seq and BS-seq) analysis, the estimation conversion rate, which measures how effectively bisulfite or enzyme treatment can convert 
 unmethylated cytosines to uracil in DNA samples, is required for evaluation. By 
-comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines (#𝑇)** by the **total number of cytosines (#𝑇 + C)** and multiplying by 100. 
+comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines ($N_T$)** by the **total number of cytosines ($N_T$ + $N_C$)** and multiplying by 100. 
 
 $$
-\text{Conversion rate} = \frac{\text{\#}T}{\text{\#}T + \text{\#}C} \times 100\%
+\text{Conversion rate} = \frac{N_T}{N_T + N_C} \times 100\%
 $$
+
 
 
 Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
