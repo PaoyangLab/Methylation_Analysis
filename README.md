@@ -111,6 +111,8 @@ The bioinformatics pipeline of methylation analysis is introduced below, includi
 
 ![overall_pipeline.png](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/overall_pipeline.png)
 
+---
+
 ### 3.1 Processing methylomes
 Here, BS-Seeker2 is used to align reads and call methylation.
 
@@ -268,6 +270,8 @@ Rscript conversion_rate.R  met1_r3_lambda.CGmap.gz
 
 In our example, the conversion rate for the wt_r1 methylome is 97.01%, which means that 97.01% of the unmethylated cytosines in the DNA sample have been successfully converted to uracil.
 
+---
+
 ### 3.2 DMR identification
 Here, MethylC-analyzer is selected to demonstrate how to find DMRs from the aligned methylation data output. To prevent environmental conflicts, the Docker image provided by the software is utilized
 #### 3.2.1 Searching DMR
@@ -296,6 +300,8 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 
 The output consists of all, hyper, and hypo DMRs as text files. Here, we found **3,282 DMRs** in CG methylation between the wt and met1 groups. 
 
+---
+
 ### 3.3 Data visualization
 #### 3.3.1 Genome browser
 
@@ -307,6 +313,8 @@ The output consists of all, hyper, and hypo DMRs as text files. Here, we found *
 4.	Select `File`>`Load from File` to load data into the track panel. Right-click the panel to adjust the graphic type or other settings.
 5.	Use the dropdown list and search box at the top panel to select the chromosome and region shown. Click `+`/`-` on the top panel to zoom in/out. Clicking or dragging on the track of the chromosome can also adjust the region shown.
 6.	Click `File`>`Save session or File`>`Save Image` to save the visualization result.
+
+---
 
 ### 3.4 Post-alignment analyses
 MethylC-analyzer provides several post-alignment analyses. Here we provide command to perform these analyses manually.
