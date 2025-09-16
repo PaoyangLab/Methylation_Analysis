@@ -53,7 +53,7 @@ wget <TOOL_URL>
 
 ## 2. Download Example Data
 
-We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset (GSE122394) from GEO, including wild-type (wt) strains as controls and *met1* mutant strains in which DNA methyltransferase 1 (MET1) functions primarily to maintain CG methylation. Each group (wild-type, met1 mutant) contains **three biological replicates**.  
+We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset [GSE122394](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122394) from GEO, including wild-type (wt) strains as controls and *met1* mutant strains in which DNA methyltransferase 1 (MET1) functions primarily to maintain CG methylation. Each group (wild-type, met1 mutant) contains **three biological replicates**.  
 
 |Name|SRA|Type|
 |----|---|----|
