@@ -314,50 +314,49 @@ MethylC-analyzer provides several post-alignment analyses. Here we provide comma
 
 ![methylC_tutorial.png](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/methylC_tutorial.png)
 
-> All of the following command require the same input files with [Step 3.2.1](#3-2-1-searching-dmr), including CGmap files, `sample_list.txt` and `gene.gtf`.
+> All of the following command require the same input files with [Step 3.2.1](#321-searching-dmr), including CGmap files, `sample_list.txt` and `gene.gtf`.
 
-#### 3.4.1 Enrichment analysis
+#### 3.4.1 Heatmap & PCA Analysis
+```bash
+docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Heatmap_PCA samples_list.txt gene.gtf /app/ -a met1 -b wt
+```
+The average methylation in 3 context (CG, CHG, CHH)
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Average_methylation_levels.png" width="400">
+PCA
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/PCA_CG_0.5.png" width="400">
+Heatmap
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Heatmap_CG_0.5.png" width="400">
+
+#### 3.4.2 DMG analysis
+```bash
+docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMG samples_list.txt gene.gtf /app/ -a met1 -b wt
+```
+Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially Methylated Genes (DMGs)
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Summary_DMR_DMG_numbers_CG_0.2.png" width="400">
+
+
+#### 3.4.3 Enrichment analysis
 
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Fold_Enrichment samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-- Genomic regions fold enrichment analysis for DMRs
+Genomic regions fold enrichment analysis for DMRs
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/CG_Fold_Enrichment.png" width="400">
 
-#### 3.4.2 Metagene analysis
+#### 3.4.4 Metagene analysis
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-- The distribution of DNA methylation around gene body
+The distribution of DNA methylation around gene body
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
-- The distribution of DNA methylation difference around gene body
+The distribution of DNA methylation difference around gene body
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_delta_CG.png" width="400">
-
-#### 3.4.3 DMG analysis
-```bash
-docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMG samples_list.txt gene.gtf /app/ -a met1 -b wt
-```
-- Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially Methylated Genes (DMGs)
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Summary_DMR_DMG_numbers_CG_0.2.png" width="400">
-
-
-#### 3.4.4 Heatmap & PCA Analysis
-```bash
-docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Heatmap_PCA samples_list.txt gene.gtf /app/ -a met1 -b wt
-```
-- The average methylation in 3 context (CG, CHG, CHH)
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Average_methylation_levels.png" width="400">
-- PCA
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/PCA_CG_0.5.png" width="400">
-- Heatmap
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Heatmap_CG_0.5.png" width="400">
-
 
 #### 3.4.5 Chromosome View Analysis
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py ChrView samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-- The distribution fo DNA methylation on each chromosome
+The distribution fo DNA methylation on each chromosome
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_CG.png" width="800">
-- The distribution fo DNA methylation difference on each chromosome
+The distribution fo DNA methylation difference on each chromosome
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_delta_CG.png" width="800">
