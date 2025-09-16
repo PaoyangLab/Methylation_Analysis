@@ -22,19 +22,18 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 
 ## 1. Tools Installation
 
+make a directory for pipeline test
+```bash
+mkdir ~/test_methylation_analysis
+cd ~/test_methylation_analysis
+```
+
 ### From GitHub
 - [SRA Toolkit 3.0.5](https://github.com/ncbi/sra-tools)  
 - [BS-Seeker2 v2.0.8](https://github.com/BSSeeker/BSseeker2)  
 - [Trim Galore v0.4.1](https://github.com/FelixKrueger/TrimGalore)
 - [HOME v1.0.0](https://github.com/ListerLab/HOME)  
 - [MethylC-analyzer](https://github.com/RitataLU/MethylC-analyzer)  
-
-
-> make a directory for pipeline test
-```bash
-mkdir ~/test_methylation_analysis
-cd ~/test_methylation_analysis
-```
 
 > For the GitHub tools, please download the repository through `clone` command and install them by following the instructions in their manuals.
 ```bash
