@@ -70,7 +70,7 @@ We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset [GSE122394]
 |met1_r2|SRR8180323|MET1 mutant|
 |met1_r3|SRR8180324|MET1 mutant|
 
-To obtain the data, you can use SRA Toolkit to download the file by `prefetch` and then convert it into the FASTQ format (.fastq) for analysis by `fast-dump`.
+> To obtain the data, you can use SRA Toolkit to download the file by `prefetch` and then convert it into the FASTQ format (.fastq) for analysis by `fast-dump`.
 
 ```bash
  ## download SRA data
@@ -90,7 +90,7 @@ To obtain the data, you can use SRA Toolkit to download the file by `prefetch` a
  fastq-dump SRR8180324
 ```
 
-Use `mv` command to rename the fastq file 
+> Use `mv` command to rename the fastq file 
 
 ```bash
  mv SRR8180314.fastq wt_r1.fastq
@@ -101,8 +101,7 @@ Use `mv` command to rename the fastq file
  mv SRR8180324.fastq met1_r3.fastq
 ```
 
-
-Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html).
+> Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html).
 
 ---
 
@@ -219,9 +218,9 @@ $$
 
 Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
 
-1. The first step for the conversion rate is the same as above but changes the input reference genome to the lambda phage genome `lambda_genome.fa`.
+1. The first step for the conversion rate is the same as above but changes the input reference genome to the lambda phage genome.
 ```bash
-# build link to genome.fa
+# download genome.fa and build index
 wget https://s3.amazonaws.com/igenomes.illumina.com/Enterobacteriophage_lambda/NCBI/1993-04-28/Enterobacteriophage_lambda_NCBI_1993-04-28.tar.gz
 tar -xzvf Enterobacteriophage_lambda_NCBI_1993-04-28.tar.gz
 bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/WholeGenomeFasta/genome.fa --aligner=bowtie2 -d ./BS2_lambda_Index
