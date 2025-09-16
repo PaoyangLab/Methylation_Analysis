@@ -71,6 +71,18 @@ prefetch <SRA_ID> ## download SRA data
 fastq-dump <SRA_ID> ## transfer into fastq file 
 ```
 
+Use `mv` command to rename the fastq file 
+
+```bash
+ mv SRR8180322.fastq met1_r1.fastq
+ mv SRR8180323.fastq met1_r2.fastq
+ mv SRR8180324.fastq met1_r3.fastq
+ mv SRR8180314.fastq wt_r1.fastq
+ mv SRR8180315.fastq wt_r2.fastq
+ mv SRR8180316.fastq wt_r3.fastq
+```
+
+
 Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html).
 
 ---
