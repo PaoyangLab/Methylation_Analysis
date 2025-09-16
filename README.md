@@ -321,21 +321,23 @@ MethylC-analyzer provides several post-alignment analyses. Here we provide comma
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Fold_Enrichment samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-
+- Genomic regions fold enrichment analysis for DMRs
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/CG_Fold_Enrichment.png" width="400">
 
 #### 3.4.2 Metagene analysis
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-
+- The distribution of DNA methylation around gene body
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
+- The distribution of DNA methylation difference around gene body
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_delta_CG.png" width="400">
 
 #### 3.4.3 DMG analysis
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMG samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
+- Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially Methylated Genes (DMGs)
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Summary_DMR_DMG_numbers_CG_0.2.png" width="400">
 
 
@@ -343,9 +345,11 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Heatmap_PCA samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-
+- The average methylation in 3 context (CG, CHG, CHH)
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Average_methylation_levels.png" width="400">
+- PCA
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/PCA_CG_0.5.png" width="400">
+- Heatmap
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Heatmap_CG_0.5.png" width="400">
 
 
@@ -353,5 +357,7 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/sc
 ```bash
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py ChrView samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_CG.png" width="400">
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_delta_CG.png" width="400">
+- The distribution fo DNA methylation on each chromosome
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_CG.png" width="800">
+- The distribution fo DNA methylation difference on each chromosome
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_delta_CG.png" width="800">
