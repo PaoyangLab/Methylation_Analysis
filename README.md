@@ -83,7 +83,7 @@ The bioinformatics pipeline of methylation analysis is introduced below, includi
 
 ### 3.1 Processing methylomes
 Here, BS-Seeker2 is used to align reads and call methylation. Replicate 1 of the wild-type sample is used as an example.
-#### 3.1.1 Alignments of methyl-seq read
+#### 3.1.1 Alignments of methyl-seq reads
 1. Use bowtie2 to create a reference genome index file (Arabidopsis thaliana TAIR10 version) for the aligner. 
 > 	The `-f` specify the FASTA file of reference genome `genome.fa`, which can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). The `-d` specify the directory to save output index file.
 ```bash
@@ -98,7 +98,7 @@ bs_seeker2-align.py -i wt_r1.fastq -g genome.fa  --aligner=bowtie2 -o wt_r1_alig
 
 #### 3.1.2 Call methylation
 1. Use call methylation function to calculate the methylation level. 
-> 	Input BAM file `wt_r1_align.bam` are obtained from [Step 3.1.1](#311-alignments-of-methyl-seq-read). Output file is saved as a CGmap file nemed `wt_r1.CGmap` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specify the index file of reference genome .
+> 	Input BAM file `wt_r1_align.bam` is obtained from [Step 3.1.1](#311-alignments-of-methyl-seq-reads). Output file is saved as a CGmap file named `wt_r1.CGmap` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specify the index file of reference genome .
 ```bash
 bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1.CGmap -d ./BS2_bt2_Index/genome.fa_bowtie2
 ```
@@ -113,9 +113,7 @@ Each CpG site contains the following information: chromosome, nucleotide on Wats
 ![CpGmap_table.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CpGmap_table.png)
 
 #### 3.1.3 Conversion rate
-In regard to methyl-seq (EM-seq and BS-seq) analysis, the estimation conversion rate, which measures how effectively bisulfite or enzyme treatment can convert 
-unmethylated cytosines to uracil in DNA samples, is required for evaluation. By 
-comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines ($N_T$)** by the **total number of cytosines ($N_T$ + $N_C$)** and multiplying by 100. 
+In regard to methyl-seq (EM-seq and BS-seq) analysis, the estimation conversion rate, which measures how effectively bisulfite or enzyme treatment can convert unmethylated cytosines to uracil in DNA samples, is required for evaluation. By comparing the unmethylated bacteriophage lambda genome as a reference to our bisulfite/enzyme treatment genomes, the percentage of successfully converted cytosines can be estimated. It is simply calculated by dividing the number of **converted cytosines ($N_T$)** by the **total number of cytosines ($N_T$ + $N_C$)** and multiplying by 100. 
 
 $$
 \text{Conversion rate} = \frac{N_T}{N_T + N_C} \times 100\%
@@ -125,7 +123,7 @@ $$
 
 Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
 
-1. The first step for the conversion rate is the same as above but changes the in-put reference genome to the lambda phage genome `lambda_genome.fa`.
+1. The first step for the conversion rate is the same as above but changes the input reference genome to the lambda phage genome `lambda_genome.fa`.
 ```bash
 bs_seeker2-build.py -f lambda_genome.fa --aligner=bowtie2 -d ./BS2_lambda_Index
 
@@ -175,11 +173,11 @@ The output consists of all, hyper, and hypo DMRs as text files. Here, we found *
 
 ![IGV_tutorial 1.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/IGV_tutorial.png)
 
-1.	Download and activate the IGV Desktop application according to the operat-ing system. This application supports operating systems includ-ing MacOS, Windows, and Linux.
-2.	Select the reference genome from the dropdown list. Here, we chose A. thali-ana (TAIR10) as a reference genome. Additional reference genomes can be downloaded by clicking More or can be loaded from the local path (in FASTA format).
+1.	Download and activate the IGV Desktop application according to the operating system. This application supports operating systems including MacOS, Windows, and Linux.
+2.	Select the reference genome from the dropdown list. Here, we chose A. thaliana (TAIR10) as a reference genome. Additional reference genomes can be downloaded by clicking More or can be loaded from the local path (in FASTA format).
 3.	Convert the file from the WIG file to the suggested track formats, BigWig or TDF files, by running IGVtools (Click `Tools`>`Run IGVtools`).
 4.	Select `File`>`Load from File` to load data into the track panel. Right-click the panel to adjust the graphic type or other settings.
-5.	Use the dropdown list and search box at the top panel to select the chromo-some and region shown. Click `+`/`-` on the top panel to zoom in/out. Clicking or dragging on the track of the chromosome can also adjust the region shown.
+5.	Use the dropdown list and search box at the top panel to select the chromosome and region shown. Click `+`/`-` on the top panel to zoom in/out. Clicking or dragging on the track of the chromosome can also adjust the region shown.
 6.	Click `File`>`Save session or File`>`Save Image` to save the visualization result.
 
 ### 3.4 Post-alignment analyses
@@ -206,7 +204,7 @@ between the two groups (metaplot_delta_CG.pdf). The former illustrates the methy
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
-In our case, the wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
+In our case, the wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase.
 
 <img src="https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
 
