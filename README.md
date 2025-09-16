@@ -30,7 +30,7 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 
 > For the github tools, please download the repository through `clone` command and install them by following the instructions in their manuals.
 ```bash
-git clone <GITHUB_URL> 
+git clone <GIT_URL> 
 ```
 
 > For MethylC-analyzer, docker image is recommended to avoid environment conflict
@@ -82,7 +82,7 @@ The bioinformatics pipeline of methylation analysis is introduced below, includi
 ![overall_pipeline.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/overall_pipeline.png)
 
 ### 3.1 Processing methylomes
-Here, BS-Seeker2 is used for alignment and call methylation and replicate 1 of wildtype sample is implemented as example.
+Here, BS-Seeker2 is used to align reads and call methylation. Replicate 1 of the wild-type sample is used as an example.
 #### 3.1.1 Alignments of methyl-seq read
 1. Use bowtie2 to create a reference genome index file (Arabidopsis thaliana TAIR10 version) for the aligner. 
 > 	The `-f` specify the FASTA file of reference genome `genome.fa`, which can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). The `-d` specify the directory to save output index file.
@@ -98,7 +98,7 @@ bs_seeker2-align.py -i wt_r1.fastq -g genome.fa  --aligner=bowtie2 -o wt_r1_alig
 
 #### 3.1.2 Call methylation
 1. Use call methylation function to calculate the methylation level. 
-> 	Input BAM file `wt_r1_align.bam` are obtained from [Step 3.1.1](#311-alignments-of-methyl-seq-read). Output file is saved as a CGmap file nemed `wt_r1.CGmap`. The `-d` parameter is used to specify the index file of reference genome .
+> 	Input BAM file `wt_r1_align.bam` are obtained from [Step 3.1.1](#311-alignments-of-methyl-seq-read). Output file is saved as a CGmap file nemed `wt_r1.CGmap` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specify the index file of reference genome .
 ```bash
 bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1.CGmap -d ./BS2_bt2_Index/genome.fa_bowtie2
 ```
@@ -108,7 +108,7 @@ bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1.CGmap -d ./BS2_bt2_In
 zless wt_r1.CGmap.gz
 ```
 
-Each CpG site contains the following information: chromosome, nucleotide on Watson strand, position, context, dinucleotide context, methylation level, number of methylated cytosines ($N_C$), and the total number of all cytosines ($N_T$+$N_C$)
+Each CpG site contains the following information: chromosome, nucleotide on Watson strand, position, context, dinucleotide context, methylation level, number of methylated cytosines ($N_C$), and the total number of all cytosines ($N_T$ + $N_C$)
 
 ![CpGmap_table.png](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/Figures/CpGmap_table.png)
 
@@ -129,15 +129,15 @@ Typically, a conversion rate of 95% or above is preferred because it shows more 
 ```bash
 bs_seeker2-build.py -f lambda_genome.fa --aligner=bowtie2 -d ./BS2_lambda_Index
 
-bs_seeker2-align.py -i wt_r1_rmdup.fastq -g lambda_genome.fa  --aligner=bowtie2 -o wt_r1_lambda.bam -m 3 -d BS2_lambda_Index
+bs_seeker2-align.py -i wt_r1.fastq -g lambda_genome.fa  --aligner=bowtie2 -o wt_r1_lambda.bam -m 3 -d BS2_lambda_Index
 
-bs_seeker2-call_methylation.py -i wt_r1_lambda.bam -o wt_r1_lambda -d BS2_bt2_Index/genome.fa_bowtie2/
+bs_seeker2-call_methylation.py -i wt_r1_lambda.bam -o wt_r1_lambda -d BS2_lambda_Index/genome.fa_bowtie2/
 ```
 
 2. The conversion rate is calculated by the R script with the formula. 
-> 	The script [coversion_rate.R ](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/coversion_rate.R) is included in this repository.
+> 	The script [conversion_rate.R ](https://github.com/PaoyangLab/Methyaltion_Analysis/blob/main/conversion_rate.R) is included in this repository.
 ```bash
-Rscript coversion_rate.R  wt_r1_lambda.CGmap.gz
+Rscript conversion_rate.R  wt_r1_lambda.CGmap.gz
 ```
 > The output will look like:
 ```bash
@@ -203,7 +203,7 @@ DMRs exhibit a positive fold enrichment value in the IGR, suggesting a higher li
 between the two groups (metaplot_delta_CG.pdf). The former illustrates the methylation pattern along the gene body and adjacent region, while the latter directly represents the difference in distribution between wt and met1. This module also generates BigWig files (met1_r1_CG.bw) to record methylated C sites in metagene analysis, and these BigWig files can be visualized by IGV. 
 
 ```bash
-docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b mt
+docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
 In our case, the wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The met1 samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
