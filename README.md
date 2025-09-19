@@ -388,66 +388,67 @@ The distribution fo DNA methylation difference on each chromosome
 
 ---
 
-### 3.5. (Supplementary) Methylation analysis by HOME and bicycle 
+### 3.5 (Supplementary) Methylation analysis by HOME and bicycle 
 
-#### DMR analysis by HOME
+#### 3.5.1 DMR analysis by HOME
 1. Prepare input files. List CGmaps (obtained from [Step 3.1.3](#313-call-methylation)) in TXT file `sample_file.tsv`, The file is tab-delimited without a header.
 > 	Generate `sample_file.tsv`
 ```bash
 vim samples_file.txt
 ```
+
 > 	Paste following content into `samples_file.txt`, then type `:wq` to save it.
 ```bash
 wt  wt1.CGmap.gz wt2.CGmap.gz wt3.CGmap.gz  
 met1 met1_1.CGmap.gz met1_2.CGmap.gz met1_3.CGmap.gz
 ```
+
 2. Run HOME analysis. 
 > `-t` specifies methylation contexts (CG/CHG/CHH/CHN/CNN); `-i` specify input file path; `-o` specifies output directory path; `-mc` specifies minimum number of Cs in a DMR; `--BSSeeker2` indicating CGmap file from BSseeker2
 ```bash
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 ```
 
-#### Methylation analysis by bicycle
+#### 3.5.2 Methylation analysis by bicycle
 
 1. Create a project
 > `-p` specifies path to store files; `-r` specifies directory with reference genomes (put `genome.fa` from [Step3.1.2](312-alignment-of-methyl-seq-reads) here); `-f` specifies directory with reads samples (put all `_rmdup_trimmed.fq.fq` file from [Step 3.1.1](#311-quality-control-and-remove-duplicates) here).
-
 ```bash
 bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
 ```
 
 2. Create the Watson and Crick in-silico bisulfited reference genomes
-> `-p` specifies path to store files
+> `-p` specifies path to store files.
 ```bash
 bicycle reference-bisulfitation -p data/myproject
 ```
 
 3. Create the bisulfited reference genome indexes
-> `-p` specifies path to store files; `-t` specifies number of threads (only for bowtie2)
+> `-p` specifies path to store files; `-t` specifies number of threads (only for bowtie2).
 ```bash
 bicycle reference-index -p data/myproject -t 4
 ```
 
 4. Align reads to both references
-> `-p` specifies path to store files; `-t` specifies number of threads per sample and ref alignment
+> `-p` specifies path to store files; `-t` specifies number of threads per sample and ref alignment.
 ```bash
 bicycle align -p data/myproject -t 4
 ```
 
 5. Perform methylation analysis and methylcytosine calling
-> `-p` specifies path to store files; `-n` specifies number of threads to analyze; `-a` ignore reads aligned to both Watson and Crick strands
+> `-p` specifies path to store files; `-n` specifies number of threads to analyze; `-a` ignore reads aligned to both Watson and Crick strands.
 ```bash
 bicycle analyze-methylation -p data/myproject -n 4 -a 
 ```
 
 6. Perform differential methylation analysis 
-> `-p` specifies path to store files; `-t` specifies treatment-samples; `-c` specifis control-samples; `-x` specifies methylation context; `-b` specifies comma-separated (with no spaces) list of BED files to analyze at region-level
+> `-p` specifies path to store files; `-t` specifies treatment-samples; `-c` specifis control-samples; `-x` specifies methylation context; `-b` specifies comma-separated (with no spaces) list of BED files to analyze at region-level.
 
 ```bash
 bicycle analyze-differential-methylation -p data/myproject_test -t met1_r1.fastq,met1_r2.fastq,met1_r2.fastq -c wt_r1.fastq,wt_r2.fastq,wt_r2.fastq -x CG -b TAIR10_500bp.bed
 ```
 
-> The BED file for DMR analysis can generated through following bash script
+> The BED file for DMR analysis can generated through following bash script.
 ```bash
 #!/bin/bash
 
@@ -457,7 +458,6 @@ Info="tair10.chrom.sizes"
 bedtools makewindows -g $Info -w $windows > TAIR10_${windows}bp.bed
 ```
 > The `tair10.chrom.sizes` is a table providing chromosom size in TAIR10 genome. The table is tab-delimited without a header:
-
 ```tsv
 1       30427671
 2       19698289
