@@ -446,7 +446,7 @@ bicycle analyze-methylation -p data/myproject -n 4 -a
 > `-p` specifies path to store files; `-t` specifies treatment-samples; `-c` specifis control-samples; `-x` specifies methylation context; `-b` specifies comma-separated (with no spaces) list of BED files to analyze at region-level.
 
 ```bash
-bicycle analyze-differential-methylation -p data/myproject_test -t met1_r1.fastq,met1_r2.fastq,met1_r2.fastq -c wt_r1.fastq,wt_r2.fastq,wt_r2.fastq -x CG -b TAIR10_500bp.bed
+bicycle analyze-differential-methylation -p data/myproject_test -t met1_r1_rmdup_trimmed.fq,met1_r2_rmdup_trimmed.fq,met1_r2_rmdup_trimmed.fq -c wt_r1_rmdup_trimmed.fq,wt_r2_rmdup_trimmed.fq,wt_r2_rmdup_trimmed.fq -x CG -b TAIR10_500bp.bed
 ```
 
 > The BED file for DMR analysis can generated through following bash script.
