@@ -17,7 +17,7 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 	- [3.2 DMR identification](#32-dmr-identification)
 	- [3.3 Data visualization](#33-data-visualization)
 	- [3.4 Post-alignment analyses](#34-post-alignment-analyses)
- 	- [3.5 (Supplementary) Methylation analysis by HOME and bicycle](#35-(supplementary)-methylation-analysis-by-home-and-bicycle)
+ 	- [3.5 (Supplementary) Methylation analysis by HOME and bicycle](#35-supplementary-methylation-analysis-by-home-and-bicycle)
 
 ---
 
@@ -413,7 +413,7 @@ HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 #### 3.5.2 Methylation analysis by bicycle
 
 1. Create a project
-> `-p` specifies path to store files; `-r` specifies directory with reference genomes (put `genome.fa` from [Step3.1.2](312-alignment-of-methyl-seq-reads) here); `-f` specifies directory with reads samples (put all `_rmdup_trimmed.fq.fq` file from [Step 3.1.1](#311-quality-control-and-remove-duplicates) here).
+> `-p` specifies path to store files; `-r` specifies directory with reference genomes (put `genome.fa` from [Step3.1.2](#312-alignment-of-methyl-seq-reads) here); `-f` specifies directory with reads samples (put all `_rmdup_trimmed.fq.fq` file from [Step 3.1.1](#311-quality-control-and-remove-duplicates) here).
 ```bash
 bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
 ```
