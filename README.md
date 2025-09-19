@@ -391,7 +391,7 @@ The distribution fo DNA methylation difference on each chromosome
 ### 3.5 (Supplementary) Methylation analysis by HOME and bicycle 
 
 #### 3.5.1 DMR analysis by HOME
-1. Prepare input files. List CGmaps (obtained from [Step 3.1.3](#313-call-methylation)) in TXT file `sample_file.tsv`, The file is tab-delimited without a header.
+1. List CGmaps (obtained from [Step 3.1.3](#313-call-methylation)) in TXT file `sample_file.tsv`, The file is tab-delimited without a header.
 > 	Generate `sample_file.tsv`
 ```bash
 vim samples_file.txt
