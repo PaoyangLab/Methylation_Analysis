@@ -17,6 +17,7 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 	- [3.2 DMR identification](#32-dmr-identification)
 	- [3.3 Data visualization](#33-data-visualization)
 	- [3.4 Post-alignment analyses](#34-post-alignment-analyses)
+ 	- [3.5 (Supplementary) Methylation analysis by HOME and bicycle](#35-(supplementary)-methylation-analysis-by-home-and-bicycle)
 
 ---
 
