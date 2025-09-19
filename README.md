@@ -282,7 +282,7 @@ Here, MethylC-analyzer is selected to demonstrate how to find DMRs from the alig
   		vim samples_list.txt
   		```
   		> Paste following content into `samples_list.txt`, then type `:wq` to save it.
-		```bash
+		```tsv
 		wt_r1	wt_r1.CGmap.gz	wt
 		wt_r2	wt_r2.CGmap.gz	wt
 		wt_r3	wt_r3.CGmap.gz	wt
@@ -398,7 +398,7 @@ vim samples_file.txt
 ```
 
 > 	Paste following content into `samples_file.txt`, then type `:wq` to save it.
-```bash
+```tsv
 wt  wt1.CGmap.gz wt2.CGmap.gz wt3.CGmap.gz  
 met1 met1_1.CGmap.gz met1_2.CGmap.gz met1_3.CGmap.gz
 ```
@@ -436,7 +436,7 @@ bicycle align -p data/myproject -t 4
 ```
 
 5. Perform methylation analysis and methylcytosine calling
-> `-p` specifies path to store files; `-n` specifies number of threads to analyze; `-a` ignore reads aligned to both Watson and Crick strands.
+> `-p` specifies path to store files; `-n` specifies number of threads to analyze; `-a` ignores reads aligned to both Watson and Crick strands.
 ```bash
 bicycle analyze-methylation -p data/myproject -n 4 -a 
 ```
