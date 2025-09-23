@@ -92,7 +92,7 @@ We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset [GSE122394]
 
 ```bash
 ## Download SRA data
-# Usage: prefetch [ options ] [ accessions(s)... ]
+# Usage: prefetch [options] <accessions(s)>
 prefetch SRR8180314
 prefetch SRR8180315
 prefetch SRR8180316
@@ -101,7 +101,7 @@ prefetch SRR8180323
 prefetch SRR8180324
 
 ## Convert into fastq file 
-#  Usage: fastq-dump [ options ] [ accessions(s)... ]
+#  Usage: fastq-dump [options] <accessions(s)>
 #  --split-3   3-way splitting for mate-pairs. 
 fastq-dump SRR8180314
 fastq-dump SRR8180315
@@ -144,7 +144,7 @@ Before alignment, the methyl-seq reads should undergo quality control (QC) and t
 > Fastqc generates QC report for checking read quality, the output file name will look like `wt_r1_fastqc.html` and `wt_r1_fastqc.zip`. Check the HTML file to get QC report.
 ```bash
 # Usage: fastqc [-o output dir] [--(no)extract] [-f fastq|bam|sam]
-#        [-c contaminant file] seqfile1 .. seqfileN
+#        [-c contaminant file] <seqfile(s)>
 fastqc wt_r1.fastq
 fastqc wt_r2.fastq
 fastqc wt_r3.fastq
@@ -156,7 +156,7 @@ fastqc met1_r3.fastq
 2. Removing duplicates
 > The script `FilterReads.py` can be found from [BS-Seeker2](https://github.com/BSSeeker/BSseeker2/blob/master/FilterReads.py). The `-i` specifies the input FASTQ file like `wt_r1.fastq`, which is obtained from [Step 2](#2-download-example-data); `-o` specifies the output file `wt_r1_rmdup.fastq`; `wt_r1_FilterReads.log` records the processing log.
 ```bash
-# Usage: FilterReads.py -i <input> -o <output> [-k]
+# Usage: FilterReads.py -i <input> -o <output>
 ./BSseeker2/FilterReads.py -i wt_r1.fastq -o wt_r1_rmdup.fastq > wt_r1_FilterReads.log
 ./BSseeker2/FilterReads.py -i wt_r2.fastq -o wt_r2_rmdup.fastq > wt_r2_FilterReads.log
 ./BSseeker2/FilterReads.py -i wt_r3.fastq -o wt_r3_rmdup.fastq > wt_r3_FilterReads.log
@@ -172,7 +172,7 @@ fastqc met1_r3.fastq
 mkdir qc_trimming
 
 ## Trimming
-# Usage: trim_galore [options] <filename(s)>
+# Usage: trim_galore [--fastqc_args] "[--outdir] <output_directory>" <filename(s)>
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r1_rmdup.fastq
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r2_rmdup.fastq
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r3_rmdup.fastq
@@ -193,14 +193,15 @@ wget https://s3.amazonaws.com/igenomes.illumina.com/Arabidopsis_thaliana/NCBI/TA
 tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 
 ## Generate index
-# Usage: bs_seeker2-build.py -f <reference_genome> -d <output>
+# Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 ./BSseeker2/bs_seeker2-build.py -f ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa --aligner=bowtie2 -d ./BS2_bt2_Index
 ```
 
 2. Align raw reads of wild-type replicate 1 to the reference genome.
-> 	The `-i` specifies input FASTQ file `wt_r1_rmdup_trimmed.fq`, which is obtained from [Step 3.1.1](#311-quality-control-and-remove-duplicates); the `-g` specifies reference genome `genome.fa` obtained from previous step; and `-o` specifies output BAM file named `wt_r1_align.bam`.
+> 	The `-i` specifies input FASTQ file `wt_r1_rmdup_trimmed.fq`, which is obtained from [Step 3.1.1](#311-quality-control-and-remove-duplicates); the `-g` specifies reference genome `genome.fa` obtained from previous step; and `-o` specifies output BAM file named `wt_r1_align.bam`; `-d` specifies the index of reference genome.
 ```bash
-# Usage: bs_seeker2-align.py -i <input> -g <reference_genome> -o <output>
+# Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
+# 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
 ./BSseeker2/bs_seeker2-align.py -i wt_r1_rmdup_trimmed.fq -g ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa \
   --aligner=bowtie2 -o wt_r1_align.bam -d ./BS2_bt2_Index
 ./BSseeker2/bs_seeker2-align.py -i wt_r2_rmdup_trimmed.fq -g ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa \
@@ -219,7 +220,7 @@ tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 1. Use methylation-calling function to calculate the methylation level. 
 > 	Input BAM file `wt_r1_align.bam` is obtained from [Step 3.1.2](#312-alignment-of-methyl-seq-reads). Output file is saved as a CGmap file named `wt_r1` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specifies the index file of reference genome.
 ```bash
-# Usage: bs_seeker2-call_methylation.py -i <input> -o <output> -d <refernce index>
+# Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1 -d ./BS2_bt2_Index/genome.fa_bowtie2
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r2_align.bam -o wt_r2 -d ./BS2_bt2_Index/genome.fa_bowtie2
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r3_align.bam -o wt_r3 -d ./BS2_bt2_Index/genome.fa_bowtie2
@@ -255,12 +256,13 @@ wget https://s3.amazonaws.com/igenomes.illumina.com/Enterobacteriophage_lambda/N
 tar -xzvf Enterobacteriophage_lambda_NCBI_1993-04-28.tar.gz
 
 ## Build index
-# Usage: bs_seeker2-build.py -f <reference_genome> -d <output>
+# Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/WholeGenomeFasta/genome.fa --aligner=bowtie2 -d ./BS2_lambda_Index
 ```
 ```bash
 ## Alignment
-# Usage: bs_seeker2-align.py -i <input> -g <reference_genome> -o <output>
+# Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
+# 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
 
 ./BSseeker2/bs_seeker2-align.py -i wt_r1_rmdup_trimmed.fq -g ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/WholeGenomeFasta/genome.fa \
   --aligner=bowtie2 -o wt_r1_lambda.bam -m 3 -d ./BS2_lambda_Index
@@ -277,7 +279,7 @@ bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/Who
 ```
 ```bash
 ## Call methylation
-# Usage: bs_seeker2-call_methylation.py -i <input> -o <output> -d <refernce index>
+# Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r1_lambda.bam -o wt_r1_lambda -d BS2_lambda_Index/genome.fa_bowtie2/
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r2_lambda.bam -o wt_r2_lambda -d BS2_lambda_Index/genome.fa_bowtie2/
@@ -290,7 +292,7 @@ bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/Who
 2. The conversion rate is calculated by the R script with the formula above. 
 > 	The script [conversion_rate.R ](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/conversion_rate.R) is included in this repository.
 ```bash
-# Usage: Rscript conversion_rate.R <CGmap_filename>
+# Usage: conversion_rate.R <CGmap_filename>
 Rscript conversion_rate.R  wt_r1_lambda.CGmap.gz
 Rscript conversion_rate.R  wt_r2_lambda.CGmap.gz
 Rscript conversion_rate.R  wt_r3_lambda.CGmap.gz
@@ -448,7 +450,7 @@ met1 met1_1.CGmap.gz met1_2.CGmap.gz met1_3.CGmap.gz
 2. Run HOME analysis. 
 > `-t` specifies methylation contexts (CG/CHG/CHH/CHN/CNN); `-i` specify input file path; `-o` specifies output directory path; `-mc` specifies minimum number of Cs in a DMR; `--BSSeeker2` indicating CGmap file from BSseeker2
 ```bash
-# Usage: HOME-pairwise -t <contexts> -i <sample_list> -o <output_directory> -mc <minimum_number_of_Cs>  
+# Usage: HOME-pairwise -t <contexts> -i <sample_list> -o <output_directory> -mc <min_number_of_Cs> [--BSSeeker2 source of CGmap]
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 ```
 
@@ -485,7 +487,7 @@ bicycle align -p data/myproject -t 4
 5. Perform methylation analysis and methylcytosine calling
 > `-p` specifies path to store files; `-n` specifies number of threads to analyze; `-a` ignores reads aligned to both Watson and Crick strands.
 ```bash
-# Usage: bicycle [command] -p <project_path> -n <threads>
+# Usage: bicycle [command] -p <project_path> -n <threads> [-a ignore double-aligned reads]
 bicycle analyze-methylation -p data/myproject -n 4 -a 
 ```
 
