@@ -10,14 +10,31 @@ The pipeline covers read alignment, methylation calling, DMR identification, vis
 
 ## Table of Contents
 
-- [1. Installation](#1-tools-installation)
-- [2. Download Example Data](#2-download-example-data)
-- [3. Analysis Pipeline](#3-analysis-pipeline)
-	- [3.1 Processing methylomes](#31-processing-methylomes)
-	- [3.2 DMR identification](#32-dmr-identification)
-	- [3.3 Data visualization](#33-data-visualization)
-	- [3.4 Post-alignment analyses](#34-post-alignment-analyses)
- 	- [3.5 (Supplementary) Methylation analysis by HOME and bicycle](#35-supplementary-methylation-analysis-by-home-and-bicycle)
+- [Bioinformatics Analysis of DNA Methylation](#bioinformatics-analysis-of-dna-methylation)
+	- [Table of Contents](#table-of-contents)
+	- [1. Tools Installation](#1-tools-installation)
+		- [From GitHub](#from-github)
+		- [From Other Sites](#from-other-sites)
+	- [2. Download Example Data](#2-download-example-data)
+	- [3. Analysis Pipeline](#3-analysis-pipeline)
+		- [3.1 Processing methylomes](#31-processing-methylomes)
+			- [3.1.1 Quality control and Remove duplicates](#311-quality-control-and-remove-duplicates)
+			- [3.1.2 Alignment of methyl-seq reads](#312-alignment-of-methyl-seq-reads)
+			- [3.1.3 Call methylation](#313-call-methylation)
+			- [3.1.4 Conversion rate](#314-conversion-rate)
+		- [3.2 DMR identification](#32-dmr-identification)
+			- [3.2.1 Searching DMR](#321-searching-dmr)
+		- [3.3 Data visualization](#33-data-visualization)
+			- [3.3.1 Genome browser](#331-genome-browser)
+		- [3.4 Post-alignment analyses](#34-post-alignment-analyses)
+			- [3.4.1 Heatmap \& PCA Analysis](#341-heatmap--pca-analysis)
+			- [3.4.2 DMG analysis](#342-dmg-analysis)
+			- [3.4.3 Enrichment analysis](#343-enrichment-analysis)
+			- [3.4.4 Metagene analysis](#344-metagene-analysis)
+			- [3.4.5 Chromosome View Analysis](#345-chromosome-view-analysis)
+		- [3.5 (Supplementary) Methylation analysis by HOME and bicycle](#35-supplementary-methylation-analysis-by-home-and-bicycle)
+			- [3.5.1 DMR analysis by HOME](#351-dmr-analysis-by-home)
+			- [3.5.2 Methylation analysis by bicycle](#352-methylation-analysis-by-bicycle)
 
 ---
 
@@ -74,32 +91,35 @@ We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset [GSE122394]
 > To obtain the data, you can use SRA Toolkit to download the file by `prefetch` and then convert it into the FASTQ format (.fastq) for analysis by `fast-dump`.
 
 ```bash
- ## download SRA data
- prefetch SRR8180314
- prefetch SRR8180315
- prefetch SRR8180316
- prefetch SRR8180322
- prefetch SRR8180323
- prefetch SRR8180324
+## download SRA data
+# Usage: prefetch [ options ] [ accessions(s)... ]
+prefetch SRR8180314
+prefetch SRR8180315
+prefetch SRR8180316
+prefetch SRR8180322
+prefetch SRR8180323
+prefetch SRR8180324
 
- ## convert into fastq file 
- fastq-dump SRR8180314
- fastq-dump SRR8180315
- fastq-dump SRR8180316
- fastq-dump SRR8180322
- fastq-dump SRR8180323
- fastq-dump SRR8180324
+## convert into fastq file 
+#  Usage: fastq-dump [ options ] [ accessions(s)... ]
+#  --split-3   3-way splitting for mate-pairs. 
+fastq-dump SRR8180314
+fastq-dump SRR8180315
+fastq-dump SRR8180316
+fastq-dump SRR8180322
+fastq-dump SRR8180323
+fastq-dump SRR8180324
 ```
 
 > Use `mv` command to rename the fastq file 
 
 ```bash
- mv SRR8180314.fastq wt_r1.fastq
- mv SRR8180315.fastq wt_r2.fastq
- mv SRR8180316.fastq wt_r3.fastq
- mv SRR8180322.fastq met1_r1.fastq
- mv SRR8180323.fastq met1_r2.fastq
- mv SRR8180324.fastq met1_r3.fastq
+mv SRR8180314.fastq wt_r1.fastq
+mv SRR8180315.fastq wt_r2.fastq
+mv SRR8180316.fastq wt_r3.fastq
+mv SRR8180322.fastq met1_r1.fastq
+mv SRR8180323.fastq met1_r2.fastq
+mv SRR8180324.fastq met1_r3.fastq
 ```
 
 > Reference genome (TAIR10) can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html).
@@ -123,6 +143,8 @@ Before alignment, the methyl-seq reads should undergo quality control (QC) and t
 1. Quality control
 > Fastqc generates QC report for checking read quality, the output file name will look like `wt_r1_fastqc.html` and `wt_r1_fastqc.zip`. Check the HTML file to get QC report.
 ```bash
+# fastqc [-o output dir] [--(no)extract] [-f fastq|bam|sam]
+#        [-c contaminant file] seqfile1 .. seqfileN
 fastqc wt_r1.fastq
 fastqc wt_r2.fastq
 fastqc wt_r3.fastq
@@ -134,6 +156,7 @@ fastqc met1_r3.fastq
 2. Removing duplicates
 > The script `FilterReads.py` can be found from [BS-Seeker2](https://github.com/BSSeeker/BSseeker2/blob/master/FilterReads.py). The `-i` specifies the input FASTQ file like `wt_r1.fastq`, which is obtained from [Step 2](#2-download-example-data); `-o` specifies the output file `wt_r1_rmdup.fastq`; `wt_r1_FilterReads.log` records the processing log.
 ```bash
+# Usage: FilterReads.py -i <input> -o <output> [-k]
 ./BSseeker2/FilterReads.py -i wt_r1.fastq -o wt_r1_rmdup.fastq > wt_r1_FilterReads.log
 ./BSseeker2/FilterReads.py -i wt_r2.fastq -o wt_r2_rmdup.fastq > wt_r2_FilterReads.log
 ./BSseeker2/FilterReads.py -i wt_r3.fastq -o wt_r3_rmdup.fastq > wt_r3_FilterReads.log
@@ -149,6 +172,7 @@ fastqc met1_r3.fastq
 mkdir qc_trimming
 
 # trimming
+# Usage: trim_galore [options] <filename(s)>
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r1_rmdup.fastq
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r2_rmdup.fastq
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r3_rmdup.fastq
