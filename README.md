@@ -81,75 +81,152 @@ docker pull peiyulin/methylc:V1.0
 
 > This section summarizes key usage and parameters. Full, reproducible commands are in the [Tutorial](#tutorial) below.
 
+### Download data
+**SRA Toolkit** — download FASTQ files
+Download SRA data
+```bash
+# Usage: prefetch [options] <accessions(s)>
+prefetch SRR8180314
+```
+
+Convert into fastq file 
+```bash
+#  Usage: fastq-dump [options] <accessions(s)>
+#  --split-3   3-way splitting for mate-pairs. 
+fastq-dump SRR8180314
+```
+
 ### QC Tools
 **FastQC** — quality report generation  
 ```bash
-# fastqc <seqfile(s)>
+# Usage: fastqc [-o output dir] [--(no)extract] [-f fastq|bam|sam]
+#        [-c contaminant file] <seqfile(s)>
 fastqc sample.fastq
 ```
 
 **Trim Galore** — adapter trimming (+ auto FastQC)  
+> `--fastqc_args` set up the directory of QC report.
 ```bash
-# trim_galore [--fastqc_args] "[--outdir] <output_directory>" <filename(s)>
+# Usage: trim_galore [--fastqc_args] "[--outdir] <output_directory>" <filename(s)>
 trim_galore --fastqc_args "--outdir ./qc_trimming" sample.fastq
 ```
 
 ### Read Processing
 **BS-Seeker2: FilterReads** — PCR duplicate removal  
+> `-i` specifies the input FASTQ file
+> `-o` specifies the output FASTQ file
 ```bash
-# FilterReads.py -i <input> -o <output>
+# Usage: FilterReads.py -i <input> -o <output>
 ./BSseeker2/FilterReads.py -i sample.fastq -o sample_rmdup.fastq > sample_FilterReads.log
 ```
 
 ### Alignment & Methylation Calling
 **BS-Seeker2: build index (bowtie2)**  
+> `-f` specifies the FASTA file of reference genome
+> `-d` specifies the directory to save output index file
 ```bash
-# bs_seeker2-build.py -f <reference_genome> --aligner=bowtie2 -d <output>
+# Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 ./BSseeker2/bs_seeker2-build.py -f genome.fa --aligner=bowtie2 -d ./BS2_bt2_Index
 ```
 
 **BS-Seeker2: align**  
+> `-i` specifies input FASTQ file
+> `-g` specifies reference genome
+> `-o` specifies output BAM file
+> `-d` specifies the index of reference genome
 ```bash
-# bs_seeker2-align.py -i <fastq> -g <ref.fa> --aligner=bowtie2 -o <out.bam> -d <index_dir>
+# Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
+# 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
 ./BSseeker2/bs_seeker2-align.py -i sample_rmdup_trimmed.fq -g genome.fa \
   --aligner=bowtie2 -o sample_align.bam -d ./BS2_bt2_Index
 ```
 
-**BS-Seeker2: call methylation**  
+**BS-Seeker2: call methylation** 
+> `-i` specifies input BAM file
+> `-o` specifies output CGmap file
+> `-d` specifies the index file of reference genome
 ```bash
-# bs_seeker2-call_methylation.py -i <bam> -o <out_prefix> -d <index_dir/genome.fa_bowtie2>
+# Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 ./BSseeker2/bs_seeker2-call_methylation.py -i sample_align.bam -o sample -d ./BS2_bt2_Index/genome.fa_bowtie2
 ```
 
 **Conversion rate estimation (lambda genome)**  
-- Build lambda index, align reads, call methylation as above; then:  
 ```bash
-# conversion_rate.R <CGmap.gz>
+# Usage: conversion_rate.R <CGmap_filename>
 Rscript conversion_rate.R sample_lambda.CGmap.gz
 ```
 
 ### DMR / Downstream Analysis
-**MethylC‑analyzer (Docker)** — DMRs, Heatmap/PCA, DMG, Enrichment, Metagene, Chromosome view  
+**MethylC‑analyzer (Docker)** 
+> Commands including: DMR, Heatmap_PCA, DMG, Fold_Enrichment, Metaplot, ChrView
+> For DMR analysis, The default minimum depth for CpG sites and the number of sites within a region are both set to **4**. The default size of the DMR is **500 base pairs (bp)**. The default p-value cutoff for Student’s t-test for identifying DMRs is **P<0.05**. These arguments can be adjusted by users.
+> The `-a` and `-b` specifies the group names. 
 ```bash
-# MethylC.py [command] <sample_list> <gene.gtf> <out_dir> -a <groupA> -b <groupB>
+# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 \
   python /MethylC-analyzer/scripts/MethylC.py DMR samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
 **HOME** — DMRs from CGmaps  
+> `-t` specifies methylation contexts (CG/CHG/CHH/CHN/CNN)
+> `-i` specify input file path
+> `-o` specifies output directory path
+> `-mc` specifies minimum number of Cs in a DMR
+> `--BSSeeker2` indicating CGmap file from BSseeker2
 ```bash
 # HOME-pairwise -t <contexts> -i <sample_list.tsv> -o <out_dir> -mc <min_Cs> [--BSSeeker2]
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 ```
 
-**bicycle** — end-to-end methylation + differential analysis  
+**bicycle** — end-to-end methylation + differential analysis   
+Create project
+> `-p` specifies path to store files
+> `-r` specifies directory with reference genomes
+> `-f` specifies directory with reads samples
 ```bash
-# bicycle create-project/reference-bisulfitation/reference-index/align/analyze-methylation
-bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
+# Usage: bicycle [command] -p <project_path> -r <reference_genome> -f <reads_directory> bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
+```
+Create reference genomes
+> `-p` specifies path to store files.
+```bash
+# Usage: bicycle [command] -p <project_path>
 bicycle reference-bisulfitation -p data/myproject
+```
+> `-p` specifies path to store files
+> `-t` specifies number of threads (only for bowtie2).
+Create reference genome indexes
+
+```bash
+# Usage: bicycle [command] -p <project_path> -t <threads>
 bicycle reference-index -p data/myproject -t 4
+```
+
+Alignment 
+> `-p` specifies path to store files
+> `-t` specifies number of threads per sample and ref alignment.
+```bash
+# Usage: bicycle [command] -p <project_path> -t <threads_per_sample>
 bicycle align -p data/myproject -t 4
+```
+
+Methylation calling and analysis
+> `-p` specifies path to store files
+> `-n` specifies number of threads to analyze
+> `-a` ignores reads aligned to both Watson and Crick strands.
+```bash
+# Usage: bicycle [command] -p <project_path> -n <threads> [-a ignore double-aligned reads]
 bicycle analyze-methylation -p data/myproject -n 4 -a
+```
+
+Differential methylation analysis
+> `-p` specifies path to store files
+> `-t` specifies treatment-samples
+> `-c` specifis control-samples
+> `-x` specifies methylation context
+> `-b` specifies comma-separated (with no spaces) list of BED files to analyze at region-level.
+```bash
+# Usage: bicycle [command] -p <project_path> -t <treatment_sample(s)> -c <control_sample(s)> -x <context> -b <BED_file>
+bicycle analyze-differential-methylation -p data/myproject_test -t met1_r1_rmdup_trimmed.fq,met1_r2_rmdup_trimmed.fq,met1_r2_rmdup_trimmed.fq -c wt_r1_rmdup_trimmed.fq,wt_r2_rmdup_trimmed.fq,wt_r2_rmdup_trimmed.fq -x CG -b TAIR10_500bp.bed
 ```
 
 ### Visualization
@@ -176,7 +253,6 @@ We demonstrate the pipeline using ***Arabidopsis thaliana*** dataset [GSE122394]
 
 ```bash
 ## Download SRA data
-# Usage: prefetch [options] <accessions(s)>
 prefetch SRR8180314
 prefetch SRR8180315
 prefetch SRR8180316
@@ -185,8 +261,6 @@ prefetch SRR8180323
 prefetch SRR8180324
 
 ## Convert into fastq file 
-#  Usage: fastq-dump [options] <accessions(s)>
-#  --split-3   3-way splitting for mate-pairs. 
 fastq-dump SRR8180314
 fastq-dump SRR8180315
 fastq-dump SRR8180316
@@ -220,8 +294,6 @@ Before alignment, the methyl-seq reads should undergo quality control (QC) and t
 ##### 1.1.1 Quality control
 > Fastqc generates QC report for checking read quality, the output file name will look like `wt_r1_fastqc.html` and `wt_r1_fastqc.zip`. Check the HTML file to get QC report.
 ```bash
-# Usage: fastqc [-o output dir] [--(no)extract] [-f fastq|bam|sam]
-#        [-c contaminant file] <seqfile(s)>
 fastqc wt_r1.fastq
 fastqc wt_r2.fastq
 fastqc wt_r3.fastq
@@ -232,9 +304,8 @@ fastqc met1_r3.fastq
 
 <a id="1-1-2"></a>
 ##### 1.1.2 Removing duplicates
-> The script `FilterReads.py` can be found from [BS-Seeker2](https://github.com/BSSeeker/BSseeker2/blob/master/FilterReads.py). The `-i` specifies the input FASTQ file like `wt_r1.fastq`, which is obtained from [GSE122394](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122394); `-o` specifies the output file `wt_r1_rmdup.fastq`; `wt_r1_FilterReads.log` records the processing log.
+> The script `FilterReads.py` can be found from [BS-Seeker2](https://github.com/BSSeeker/BSseeker2/blob/master/FilterReads.py). The input FASTQ files are obtained from [GSE122394](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122394). `wt_r1_FilterReads.log` records the processing log.
 ```bash
-# Usage: FilterReads.py -i <input> -o <output>
 ./BSseeker2/FilterReads.py -i wt_r1.fastq -o wt_r1_rmdup.fastq > wt_r1_FilterReads.log
 ./BSseeker2/FilterReads.py -i wt_r2.fastq -o wt_r2_rmdup.fastq > wt_r2_FilterReads.log
 ./BSseeker2/FilterReads.py -i wt_r3.fastq -o wt_r3_rmdup.fastq > wt_r3_FilterReads.log
@@ -245,13 +316,12 @@ fastqc met1_r3.fastq
 
 <a id="1-1-3"></a>
 ##### 1.1.3 Trimming adapters
-> TrimGalore will automatically generate FastQC report after trimming. `--fastqc_args` set up the directory of QC report. The input file is `wt_r1_rmdup.fastq` and output files is `wt_r1_rmdup_trimmed.fq` 
+> TrimGalore will automatically generate FastQC report after trimming. 
 ```bash
 ## Make directory for FastQC report after trimming
 mkdir qc_trimming
 
 ## Trimming
-# Usage: trim_galore [--fastqc_args] "[--outdir] <output_directory>" <filename(s)>
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r1_rmdup.fastq
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r2_rmdup.fastq
 ./TrimGalore/trim_galore --fastqc_args "--outdir ./qc_trimming" wt_r3_rmdup.fastq
@@ -265,22 +335,19 @@ ls ./qc_trimming
 #### 1.2 Alignment of methyl-seq reads
 <a id="1-2-1"></a>
 ##### 1.2.1 Use bowtie2 to create a reference genome index file (Arabidopsis thaliana TAIR10 version) for the aligner. 
-> 	The `-f` specifies the FASTA file of reference genome `genome.fa`, which can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). The `-d` specifies the directory to save output index file.
+> 	The FASTA file of reference genome `genome.fa`can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html).
 ```bash
 ## Download and untar file
 wget https://s3.amazonaws.com/igenomes.illumina.com/Arabidopsis_thaliana/NCBI/TAIR10/Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 
 ## Generate index
-# Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 ./BSseeker2/bs_seeker2-build.py -f ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa --aligner=bowtie2 -d ./BS2_bt2_Index
 ```
 <a id="1-2-2"></a>
 ###### 1.2.2 Align raw reads of wild-type replicate 1 to the reference genome.
-> 	The `-i` specifies input FASTQ file `wt_r1_rmdup_trimmed.fq`, which is obtained from [Step 1.1.3](#1-1-3); the `-g` specifies reference genome `genome.fa` obtained from previous step; and `-o` specifies output BAM file named `wt_r1_align.bam`; `-d` specifies the index of reference genome.
+> 	Tnput FASTQ files are obtained from [Step 1.1.3](#1-1-3).
 ```bash
-# Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
-# 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
 ./BSseeker2/bs_seeker2-align.py -i wt_r1_rmdup_trimmed.fq -g ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa \
   --aligner=bowtie2 -o wt_r1_align.bam -d ./BS2_bt2_Index
 ./BSseeker2/bs_seeker2-align.py -i wt_r2_rmdup_trimmed.fq -g ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa \
@@ -298,9 +365,8 @@ tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 #### 1.3 Call methylation
 <a id="1-2-1"></a>
 ##### 1.3.1 Use methylation-calling function to calculate the methylation level.
-> 	Input BAM file `wt_r1_align.bam` is obtained from [Step 1.2.2](#1-2-2). Output file is saved as a CGmap file named `wt_r1` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specifies the index file of reference genome.
+> 	Input BAM files are obtained from [Step 1.2.2](#1-2-2).
 ```bash
-# Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1 -d ./BS2_bt2_Index/genome.fa_bowtie2
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r2_align.bam -o wt_r2 -d ./BS2_bt2_Index/genome.fa_bowtie2
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r3_align.bam -o wt_r3 -d ./BS2_bt2_Index/genome.fa_bowtie2
@@ -338,14 +404,10 @@ wget https://s3.amazonaws.com/igenomes.illumina.com/Enterobacteriophage_lambda/N
 tar -xzvf Enterobacteriophage_lambda_NCBI_1993-04-28.tar.gz
 
 ## Build index
-# Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/WholeGenomeFasta/genome.fa --aligner=bowtie2 -d ./BS2_lambda_Index
 ```
 ```bash
 ## Alignment
-# Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
-# 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
-
 ./BSseeker2/bs_seeker2-align.py -i wt_r1_rmdup_trimmed.fq -g ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/WholeGenomeFasta/genome.fa \
   --aligner=bowtie2 -o wt_r1_lambda.bam -m 3 -d ./BS2_lambda_Index
 ./BSseeker2/bs_seeker2-align.py -i wt_r2_rmdup_trimmed.fq -g ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/WholeGenomeFasta/genome.fa \
@@ -361,7 +423,6 @@ bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/Who
 ```
 ```bash
 ## Call methylation
-# Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r1_lambda.bam -o wt_r1_lambda -d BS2_lambda_Index/genome.fa_bowtie2/
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r2_lambda.bam -o wt_r2_lambda -d BS2_lambda_Index/genome.fa_bowtie2/
@@ -375,7 +436,6 @@ bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/Who
 ##### 1.4.2 The conversion rate is calculated by the R script with the formula above. 
 > 	The script [conversion_rate.R ](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/conversion_rate.R) is included in this repository.
 ```bash
-# Usage: conversion_rate.R <CGmap_filename>
 Rscript conversion_rate.R  wt_r1_lambda.CGmap.gz
 Rscript conversion_rate.R  wt_r2_lambda.CGmap.gz
 Rscript conversion_rate.R  wt_r3_lambda.CGmap.gz
@@ -415,9 +475,7 @@ Here, MethylC-analyzer is selected to demonstrate how to find DMRs from the alig
 
 <a id="2-1-2"></a>
 ##### 2.1.2 Run MethylC-analyzer to identify the DMRs
-> 	The default minimum depth for CpG sites and the number of sites within a region are both set to **4**. The default size of the DMR is **500 base pairs (bp)**. The default p-value cutoff for Student’s t-test for identifying DMRs is **P<0.05**. These arguments can be adjusted by users. The `-a` and `-b` specifies the group names.
 ```bash
-# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMR samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
@@ -445,32 +503,27 @@ MethylC-analyzer provides several post-alignment analyses. Here we provide comma
 
 #### 4.1 Heatmap & PCA Analysis
 ```bash
-# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Heatmap_PCA samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
 #### 4.2 DMG analysis
 ```bash
-# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMG samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
 #### 4.3 Enrichment analysis
 
 ```bash
-# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Fold_Enrichment samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
 #### 4.4 Metagene analysis
 ```bash
-# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
 #### 4.5 Chromosome View Analysis
 ```bash
-# Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py ChrView samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 ### 5) (Supplementary) Alternative tools
@@ -489,55 +542,41 @@ met1 met1_1.CGmap.gz met1_2.CGmap.gz met1_3.CGmap.gz
 ```
 
 2. Run HOME analysis. 
-> `-t` specifies methylation contexts (CG/CHG/CHH/CHN/CNN); `-i` specify input file path; `-o` specifies output directory path; `-mc` specifies minimum number of Cs in a DMR; `--BSSeeker2` indicating CGmap file from BSseeker2
 ```bash
-# Usage: HOME-pairwise -t <contexts> -i <sample_list> -o <output_directory> -mc <min_number_of_Cs> [--BSSeeker2 source of CGmap]
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 ```
 
 #### 5.2 Methylation analysis by bicycle
 
 1. Create a project
-> `-p` specifies path to store files; `-r` specifies directory with reference genomes (put `genome.fa` from [Step 1.2.1](#1-2-1)); `-f` specifies directory with reads samples (put all `_rmdup_trimmed.fq.fq` file from [Step 1.1.3](#1-1-3)).
+> Directory of reference genomes need put `genome.fa` from [Step 1.2.1](#1-2-1)) inside
+> Directory of reads samples need put all `_rmdup_trimmed.fq.fq` file from [Step 1.1.3](#1-1-3)) inside.
 ```bash
-# Usage: bicycle [command] -p <project_path> -r <reference_genome> -f <reads_directory> 
 bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
 ```
 
 2. Create the Watson and Crick in-silico bisulfited reference genomes
-> `-p` specifies path to store files.
 ```bash
-# Usage: bicycle [command] -p <project_path>
 bicycle reference-bisulfitation -p data/myproject
 ```
 
 3. Create the bisulfited reference genome indexes
-> `-p` specifies path to store files; `-t` specifies number of threads (only for bowtie2).
 ```bash
-# Usage: bicycle [command] -p <project_path> -t <threads>
 bicycle reference-index -p data/myproject -t 4
 ```
 
 4. Align reads to both references
-> `-p` specifies path to store files; `-t` specifies number of threads per sample and ref alignment.
 ```bash
-# Usage: bicycle [command] -p <project_path> -t <threads_per_sample>
 bicycle align -p data/myproject -t 4
 ```
 
 5. Perform methylation analysis and methylcytosine calling
-> `-p` specifies path to store files; `-n` specifies number of threads to analyze; `-a` ignores reads aligned to both Watson and Crick strands.
 ```bash
-# Usage: bicycle [command] -p <project_path> -n <threads> [-a ignore double-aligned reads]
 bicycle analyze-methylation -p data/myproject -n 4 -a 
 ```
 
 6. Perform differential methylation analysis 
-> `-p` specifies path to store files; `-t` specifies treatment-samples; `-c` specifis control-samples; `-x` specifies methylation context; `-b` specifies comma-separated (with no spaces) list of BED files to analyze at region-level.
-
 ```bash
-# Usage: bicycle [command] -p <project_path> -t <treatment_sample(s)> -c <control_sample(s)> -x <context> -b <BED_file>
-
 bicycle analyze-differential-methylation -p data/myproject_test -t met1_r1_rmdup_trimmed.fq,met1_r2_rmdup_trimmed.fq,met1_r2_rmdup_trimmed.fq -c wt_r1_rmdup_trimmed.fq,wt_r2_rmdup_trimmed.fq,wt_r2_rmdup_trimmed.fq -x CG -b TAIR10_500bp.bed
 ```
 
