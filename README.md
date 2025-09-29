@@ -166,6 +166,21 @@ Rscript conversion_rate.R sample_lambda.CGmap.gz
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 \
   python /MethylC-analyzer/scripts/MethylC.py DMR samples_list.txt gene.gtf /app/ -a met1 -b wt
+
+## Parameters
+  -h, --help          show this help message and exit
+  -a GROUP1           Name of group1
+  -b GROUP2           Name of group2
+  -d DEPTH            Minimum depth of sites. Default=4
+  -r REGION           Size of region. Default=500
+  -q QUALIFIED        Minimum sites within a region. Default=4
+  -context CONTEXT    Context used. Default=CG
+  -hc HEATMAP_CUTOFF  Methylation cutoff of PCA & Heatmap. Default = 0.2
+  -dmrc DMR_CUTOFF    Methylation cutoff of DMR. Default = 0.1
+  -test TESTMETHOD    DMR testing method. 0:TTest, 1:KS, 2:MWU. Default=0
+  -pvalue PVALUE      p-value cutoff for identifying DMR. Default = 0.05
+  -bs BIN_SIZE        Bin size of chrView and Metaplot. Default = 1000000
+  -p PROMOTER_SIZE    promoter_size
 ```
 
 **HOME** — DMRs from CGmaps  
@@ -177,6 +192,23 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 \
 ```bash
 # HOME-pairwise -t <contexts> -i <sample_list.tsv> -o <out_dir> -mc <min_Cs> [--BSSeeker2]
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
+
+## Parameters
+-sc --scorecutoff	0.1	the score from the classifier for each C position
+-p --pruncutoff	0.1	the SVM score checked for consecutive Cs from both ends to refine the boundaries
+-npp -–numprocess	8	number of cores to be used
+-ml --minlength	50	minimum length of DMRs required to be reported
+-ncb --numcb	5	minimum number of Cs present between DMRs to keep them seperate
+-md -–mergedist	500	maximum distance allowed between DMRs to merge
+-prn --prunningC	3	number of consecutives Cs to be considered for pruning for boundary refinement2
+-ns --numsamples	all	no.of samples to use for DMR calling; default takes all sample in the file
+-sp --startposition	1st position	start position of sample in the sample file to use for timeseries DMR calling
+-BSSeeker2 --BSSeeker2	False	input CGmap file from BSSeeker2
+-mc --minc	3	minimum number of Cs in a DMR
+-sin --singlechrom	False	parallel code for single chromosome; npp will be used for parallel run for each chr
+-d --delta	0.1	minimum average difference in methylation required in a DMR
+-wrt --withrespectto	all	samples to use for DMR calling for pairwise comparisions with respect to specific samples
+-Keepall --Keepall	False	Keep all cytosine positions present in atleast one of the replicate
 ```
 
 **bicycle** — end-to-end methylation + differential analysis   
