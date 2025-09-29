@@ -441,6 +441,7 @@ MethylC-analyzer provides several post-alignment analyses. Here we provide comma
 ![methylC_tutorial.png](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/methylC_tutorial.png)
 
 > All of the following command require the same input files with [Step 3.2.1](#321-searching-dmr), including CGmap files, `sample_list.txt` and `gene.gtf`.
+> The output figures are in the [Output figures](#figures) below
 
 #### 4.1 Heatmap & PCA Analysis
 ```bash
@@ -448,28 +449,11 @@ MethylC-analyzer provides several post-alignment analyses. Here we provide comma
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Heatmap_PCA samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
-The average methylation in 3 context (CG, CHG, CHH)
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Average_methylation_levels.png" width="400">
-
-PCA
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/PCA_CG_0.5.png" width="400">
-
-Heatmap
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Heatmap_CG_0.5.png" width="400">
-
 #### 4.2 DMG analysis
 ```bash
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py DMG samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-
-Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially Methylated Genes (DMGs)
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Summary_DMR_DMG_numbers_CG_0.2.png" width="400">
-
 
 #### 4.3 Enrichment analysis
 
@@ -478,39 +462,17 @@ Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially 
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Fold_Enrichment samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
-Genomic regions fold enrichment analysis for DMRs
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/CG_Fold_Enrichment.png" width="400">
-
 #### 4.4 Metagene analysis
 ```bash
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py Metaplot samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
 
-The distribution of DNA methylation around gene body
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
-
-The distribution of DNA methylation difference around gene body
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_delta_CG.png" width="400">
-
 #### 4.5 Chromosome View Analysis
 ```bash
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 python /MethylC-analyzer/scripts/MethylC.py ChrView samples_list.txt gene.gtf /app/ -a met1 -b wt
 ```
-
-The distribution fo DNA methylation on each chromosome
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_CG.png" width="800">
-
-The distribution fo DNA methylation difference on each chromosome
-
-<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_delta_CG.png" width="800">
-
-
 ### 5) (Supplementary) Alternative tools
 
 #### 5.1 DMR analysis by HOME
@@ -603,6 +565,7 @@ Pt      154478
 
 ### Outputs (files & figures)
 
+#### Files
 - **QC:** `*_fastqc.html`, logs from `FilterReads.py`, `trim_galore` outputs.  
 - **Alignment:** `*_align.bam` per sample.  
 - **Methylation calls:** `*.CGmap.gz` per sample; lambda `*_lambda.CGmap.gz` for conversion rate.  
@@ -610,8 +573,45 @@ Pt      154478
 - **Analyses/plots:** average methylation, PCA, heatmap, enrichment, metagene plots, chromosome view.  
 - **Genome browser:** IGV session/image files.
 
----
+#### Figures
 
-## Notes
-- Conversion rate (%) = `N_T / (N_T + N_C) * 100`. A value ≥95% is generally preferred.
-- The example uses **A. thaliana TAIR10** as reference (download from Illumina iGenomes).
+#### 4.1 Heatmap & PCA Analysis
+The average methylation in 3 context (CG, CHG, CHH)
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Average_methylation_levels.png" width="400">
+
+PCA
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/PCA_CG_0.5.png" width="400">
+
+#### 4.2 DMG analysis
+
+Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially Methylated Genes (DMGs)
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Summary_DMR_DMG_numbers_CG_0.2.png" width="400">
+
+#### 4.3 Enrichment analysis
+
+Genomic regions fold enrichment analysis for DMRs
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/CG_Fold_Enrichment.png" width="400">
+
+#### 4.4 Metagene analysis
+
+The distribution of DNA methylation around gene body
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
+
+The distribution of DNA methylation difference around gene body
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_delta_CG.png" width="400">
+
+##### 4.5 Chromosome View Analysis
+
+The distribution fo DNA methylation on each chromosome
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_CG.png" width="800">
+
+The distribution fo DNA methylation difference on each chromosome
+
+<img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/chrView_delta_CG.png" width="800">
