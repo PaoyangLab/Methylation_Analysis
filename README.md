@@ -41,13 +41,13 @@ The pipeline covers **read QC & trimming**, **alignment**, **methylation calling
 
 ### Environments & Requirements
 
-### Make a directory for pipeline test
+#### Make a directory for pipeline test
 ```bash
 mkdir ~/test_methylation_analysis
 cd ~/test_methylation_analysis
 ```
 
-### Install tools from GitHub
+#### Install tools from GitHub
 - [SRA Toolkit 3.0.5](https://github.com/ncbi/sra-tools)  
 - [BS-Seeker2 v2.0.8](https://github.com/BSSeeker/BSseeker2)  
 - [Trim Galore v0.4.1](https://github.com/FelixKrueger/TrimGalore)
@@ -67,7 +67,7 @@ git clone "https://github.com/ListerLab/HOME"
 docker pull peiyulin/methylc:V1.0
 ```
 
-###  Install tools from Other Sites 
+####  Install tools from Other Sites 
 - [Bowtie2 v2.26](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)  
 - [bicycle v1.8.2](http://www.sing-group.org/bicycle)  
 - [IGV Desktop v2.16.0](https://igv.org/)  
