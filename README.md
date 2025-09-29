@@ -243,8 +243,6 @@ fastqc met1_r3.fastq
 ./BSseeker2/FilterReads.py -i met1_r3.fastq -o met1_r3_rmdup.fastq > met1_r3_FilterReads.log
 ```
 
-[test1-1-1](#1-1-1)
-
 <a id="1-1-3"></a>
 ##### 1.1.3 Trimming adapters
 > TrimGalore will automatically generate FastQC report after trimming. `--fastqc_args` set up the directory of QC report. The input file is `wt_r1_rmdup.fastq` and output files is `wt_r1_rmdup_trimmed.fq` 
@@ -265,8 +263,8 @@ mkdir qc_trimming
 ls ./qc_trimming
 ```
 #### 1.2 Alignment of methyl-seq reads
-##### 1.2.1 
-**Use bowtie2 to create a reference genome index file (Arabidopsis thaliana TAIR10 version) for the aligner.** 
+<a id="1-2-1"></a>
+##### 1.2.1 Use bowtie2 to create a reference genome index file (Arabidopsis thaliana TAIR10 version) for the aligner. 
 > 	The `-f` specifies the FASTA file of reference genome `genome.fa`, which can be downloaded from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). The `-d` specifies the directory to save output index file.
 ```bash
 ## Download and untar file
@@ -277,10 +275,9 @@ tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 # Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 ./BSseeker2/bs_seeker2-build.py -f ./Arabidopsis_thaliana/NCBI/TAIR10/Sequence/WholeGenomeFasta/genome.fa --aligner=bowtie2 -d ./BS2_bt2_Index
 ```
-
-###### 1.2.2 
-**Align raw reads of wild-type replicate 1 to the reference genome.**
-> 	The `-i` specifies input FASTQ file `wt_r1_rmdup_trimmed.fq`, which is obtained from [Step 1.1.3](#113); the `-g` specifies reference genome `genome.fa` obtained from previous step; and `-o` specifies output BAM file named `wt_r1_align.bam`; `-d` specifies the index of reference genome.
+<a id="1-2-2"></a>
+###### 1.2.2 Align raw reads of wild-type replicate 1 to the reference genome.
+> 	The `-i` specifies input FASTQ file `wt_r1_rmdup_trimmed.fq`, which is obtained from [Step 1.1.3](#1-1-3); the `-g` specifies reference genome `genome.fa` obtained from previous step; and `-o` specifies output BAM file named `wt_r1_align.bam`; `-d` specifies the index of reference genome.
 ```bash
 # Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
 # 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
@@ -299,9 +296,9 @@ tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 ```
 
 #### 1.3 Call methylation
-##### 1.3.1 
-**Use methylation-calling function to calculate the methylation level.** 
-> 	Input BAM file `wt_r1_align.bam` is obtained from [Step 1.2.2](#122-align-raw-reads-of-wild-type-replicate-1-to-the-reference-genome). Output file is saved as a CGmap file named `wt_r1` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specifies the index file of reference genome.
+<a id="1-2-1"></a>
+##### 1.3.1 Use methylation-calling function to calculate the methylation level.
+> 	Input BAM file `wt_r1_align.bam` is obtained from [Step 1.2.2](#1-2-2). Output file is saved as a CGmap file named `wt_r1` (the output file will be zipped into `wt_r1.CGmap.gz`). The `-d` parameter is used to specifies the index file of reference genome.
 ```bash
 # Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 ./BSseeker2/bs_seeker2-call_methylation.py -i wt_r1_align.bam -o wt_r1 -d ./BS2_bt2_Index/genome.fa_bowtie2
@@ -312,8 +309,8 @@ tar -xzvf Arabidopsis_thaliana_NCBI_TAIR10.tar.gz
 ./BSseeker2/bs_seeker2-call_methylation.py -i met1_r3_align.bam -o met1_r3 -d ./BS2_bt2_Index/genome.fa_bowtie2
 ```
 
-##### 1.3.2 
-**View the methylation call output (CGmap). The file with each row represents a single CpG site.**
+<a id="1-3-2"></a>
+##### 1.3.2 View the methylation call output (CGmap). The file with each row represents a single CpG site.
 ```bash
 zless wt_r1.CGmap.gz
 ```
@@ -333,7 +330,8 @@ $$
 
 Typically, a conversion rate of 95% or above is preferred because it shows more reliable and accurate results.
 
-1.4.1 The first step for the conversion rate is the same as above but changes the input reference genome to the lambda phage genome.
+<a id="1-4-1"></a>
+##### 1.4.1 The first step for the conversion rate is the same as above but changes the input reference genome to the lambda phage genome.
 ```bash
 ## Download genome.fa and build index
 wget https://s3.amazonaws.com/igenomes.illumina.com/Enterobacteriophage_lambda/NCBI/1993-04-28/Enterobacteriophage_lambda_NCBI_1993-04-28.tar.gz
@@ -373,8 +371,8 @@ bs_seeker2-build.py -f ./Enterobacteriophage_lambda/NCBI/1993-04-28/Sequence/Who
 ./BSseeker2/bs_seeker2-call_methylation.py -i met1_r3_lambda.bam -o met1_r3_lambda -d BS2_lambda_Index/genome.fa_bowtie2/
 ```
 
-##### 1.4.2 
-**The conversion rate is calculated by the R script with the formula above.** 
+<a id="1-4-2"></a>
+##### 1.4.2 The conversion rate is calculated by the R script with the formula above. 
 > 	The script [conversion_rate.R ](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/conversion_rate.R) is included in this repository.
 ```bash
 # Usage: conversion_rate.R <CGmap_filename>
@@ -397,26 +395,26 @@ In our example, the conversion rate for the wt_r1 methylome is 97.01%, which mea
 
 Here, MethylC-analyzer is selected to demonstrate how to find DMRs from the aligned methylation data output. To prevent environmental conflicts, the Docker image provided by the software is utilized
 #### 2.1 Searching DMR
-##### 2.1.1 
-**Prepare input files** 
-	- List CGmaps (obtained from [Step 1.3.1](#131-use-methylation-calling-function-to-calculate-the-methylation-level)) in TXT file `samples_list.txt`, The file is tab-delimited without a header.
-		> Generate `samples_list.txt`
-		```bash
-  		vim samples_list.txt
-  		```
-  		> Paste following content into `samples_list.txt`, then type `:wq` to save it.
-		```tsv
-		wt_r1	wt_r1.CGmap.gz	wt
-		wt_r2	wt_r2.CGmap.gz	wt
-		wt_r3	wt_r3.CGmap.gz	wt
-  		met1_r1	met1_r1.CGmap.gz	met1
-		met1_r2	met1_r2.CGmap.gz	met1
-		met1_r3	met1_r3.CGmap.gz	met1
-		```
-	- Gene annotation GTF files `gene.gtf` can be downloaded from UCSC (https://hgdownload.soe.ucsc.edu/downloads.html), and it is a file format containing information about the genomic features of genes, such as exons, introns, coding sequences, and untranslated regions (UTRs).
+<a id="2-1-1"></a>
+##### 2.1.1 Prepare input files
+- List CGmaps (obtained from [Step 1.3.1](#1-3-1)) in TXT file `samples_list.txt`, The file is tab-delimited without a header.
+	> Generate `samples_list.txt`
+	```bash
+	vim samples_list.txt
+	```
+	> Paste following content into `samples_list.txt`, then type `:wq` to save it.
+	```tsv
+	wt_r1	wt_r1.CGmap.gz	wt
+	wt_r2	wt_r2.CGmap.gz	wt
+	wt_r3	wt_r3.CGmap.gz	wt
+	met1_r1	met1_r1.CGmap.gz	met1
+	met1_r2	met1_r2.CGmap.gz	met1
+	met1_r3	met1_r3.CGmap.gz	met1
+	```
+- Gene annotation GTF files `gene.gtf` can be downloaded from UCSC (https://hgdownload.soe.ucsc.edu/downloads.html), and it is a file format containing information about the genomic features of genes, such as exons, introns, coding sequences, and untranslated regions (UTRs).
 
-##### 2.1.2 
-**Run MethylC-analyzer to identify the DMRs**
+<a id="2-1-2"></a>
+##### 2.1.2 Run MethylC-analyzer to identify the DMRs
 > 	The default minimum depth for CpG sites and the number of sites within a region are both set to **4**. The default size of the DMR is **500 base pairs (bp)**. The default p-value cutoff for Student’s t-test for identifying DMRs is **P<0.05**. These arguments can be adjusted by users. The `-a` and `-b` specifies the group names.
 ```bash
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
@@ -516,7 +514,7 @@ The distribution fo DNA methylation difference on each chromosome
 ### 5) (Supplementary) Alternative tools
 
 #### 5.1 DMR analysis by HOME
-1. List CGmaps (obtained from [Step 1.3.1](#131)) in TXT file `sample_file.tsv`, The file is tab-delimited without a header.
+1. List CGmaps (obtained from [Step 1.3.1](#1-3-1)) in TXT file `sample_file.tsv`, The file is tab-delimited without a header.
 > 	Generate `sample_file.tsv`
 ```bash
 vim samples_file.tsv
@@ -538,7 +536,7 @@ HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 #### 5.2 Methylation analysis by bicycle
 
 1. Create a project
-> `-p` specifies path to store files; `-r` specifies directory with reference genomes (put `genome.fa` from [Step 1.2.1](#121)); `-f` specifies directory with reads samples (put all `_rmdup_trimmed.fq.fq` file from [Step 1.1.3](#113)).
+> `-p` specifies path to store files; `-r` specifies directory with reference genomes (put `genome.fa` from [Step 1.2.1](#1-2-1)); `-f` specifies directory with reads samples (put all `_rmdup_trimmed.fq.fq` file from [Step 1.1.3](#1-1-3)).
 ```bash
 # Usage: bicycle [command] -p <project_path> -r <reference_genome> -f <reads_directory> 
 bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
