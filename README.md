@@ -83,13 +83,12 @@ docker pull peiyulin/methylc:V1.0
 
 ### Download data
 **SRA Toolkit** — download FASTQ files
-Download SRA data
+- Download SRA data
 ```bash
 # Usage: prefetch [options] <accessions(s)>
 prefetch SRR8180314
 ```
-
-Convert into fastq file 
+- Convert into fastq file 
 ```bash
 #  Usage: fastq-dump [options] <accessions(s)>
 #  --split-3   3-way splitting for mate-pairs. 
@@ -113,8 +112,8 @@ trim_galore --fastqc_args "--outdir ./qc_trimming" sample.fastq
 
 ### Read Processing
 **BS-Seeker2: FilterReads** — PCR duplicate removal  
-> `-i` specifies the input FASTQ file
-> `-o` specifies the output FASTQ file
+> `-i` specifies the input FASTQ file; 
+> `-o` specifies the output FASTQ file.
 ```bash
 # Usage: FilterReads.py -i <input> -o <output>
 ./BSseeker2/FilterReads.py -i sample.fastq -o sample_rmdup.fastq > sample_FilterReads.log
@@ -122,18 +121,18 @@ trim_galore --fastqc_args "--outdir ./qc_trimming" sample.fastq
 
 ### Alignment & Methylation Calling
 **BS-Seeker2: build index (bowtie2)**  
-> `-f` specifies the FASTA file of reference genome
-> `-d` specifies the directory to save output index file
+> `-f` specifies the FASTA file of reference genome; 
+> `-d` specifies the directory to save output index file.
 ```bash
 # Usage: bs_seeker2-build.py -f <reference_genome> --aligner=<aligner_type> -d <output>
 ./BSseeker2/bs_seeker2-build.py -f genome.fa --aligner=bowtie2 -d ./BS2_bt2_Index
 ```
 
 **BS-Seeker2: align**  
-> `-i` specifies input FASTQ file
-> `-g` specifies reference genome
-> `-o` specifies output BAM file
-> `-d` specifies the index of reference genome
+> `-i` specifies input FASTQ file; 
+> `-g` specifies reference genome; 
+> `-o` specifies output BAM file; 
+> `-d` specifies the index of reference genome.
 ```bash
 # Usage: bs_seeker2-align.py -i <input_fastq> -g <reference_genome>  
 # 		 --aligner=<aligner_type> -o <output_bam> -d <reference_index>
@@ -142,9 +141,9 @@ trim_galore --fastqc_args "--outdir ./qc_trimming" sample.fastq
 ```
 
 **BS-Seeker2: call methylation** 
-> `-i` specifies input BAM file
-> `-o` specifies output CGmap file
-> `-d` specifies the index file of reference genome
+> `-i` specifies input BAM file; 
+> `-o` specifies output CGmap file; 
+> `-d` specifies the index file of reference genome.
 ```bash
 # Usage: bs_seeker2-call_methylation.py -i <input_bam> -o <output_CGmap> -d <refernce index>
 ./BSseeker2/bs_seeker2-call_methylation.py -i sample_align.bam -o sample -d ./BS2_bt2_Index/genome.fa_bowtie2
@@ -158,8 +157,10 @@ Rscript conversion_rate.R sample_lambda.CGmap.gz
 
 ### DMR / Downstream Analysis
 **MethylC‑analyzer (Docker)** 
-> Commands including: DMR, Heatmap_PCA, DMG, Fold_Enrichment, Metaplot, ChrView
+> Commands including: DMR, Heatmap_PCA, DMG, Fold_Enrichment, Metaplot, ChrView.
+
 > For DMR analysis, The default minimum depth for CpG sites and the number of sites within a region are both set to **4**. The default size of the DMR is **500 base pairs (bp)**. The default p-value cutoff for Student’s t-test for identifying DMRs is **P<0.05**. These arguments can be adjusted by users.
+
 > The `-a` and `-b` specifies the group names. 
 ```bash
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
@@ -168,11 +169,11 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 \
 ```
 
 **HOME** — DMRs from CGmaps  
-> `-t` specifies methylation contexts (CG/CHG/CHH/CHN/CNN)
-> `-i` specify input file path
-> `-o` specifies output directory path
-> `-mc` specifies minimum number of Cs in a DMR
-> `--BSSeeker2` indicating CGmap file from BSseeker2
+> `-t` specifies methylation contexts (CG/CHG/CHH/CHN/CNN); 
+> `-i` specify input file path; 
+> `-o` specifies output directory path; 
+> `-mc` specifies minimum number of Cs in a DMR; 
+> `--BSSeeker2` indicating CGmap file from BSseeker2.
 ```bash
 # HOME-pairwise -t <contexts> -i <sample_list.tsv> -o <out_dir> -mc <min_Cs> [--BSSeeker2]
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
@@ -180,9 +181,9 @@ HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 
 **bicycle** — end-to-end methylation + differential analysis   
 Create project
-> `-p` specifies path to store files
-> `-r` specifies directory with reference genomes
-> `-f` specifies directory with reads samples
+> `-p` specifies path to store files; 
+> `-r` specifies directory with reference genomes; 
+> `-f` specifies directory with reads samples.
 ```bash
 # Usage: bicycle [command] -p <project_path> -r <reference_genome> -f <reads_directory> bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
 ```
@@ -192,7 +193,7 @@ Create reference genomes
 # Usage: bicycle [command] -p <project_path>
 bicycle reference-bisulfitation -p data/myproject
 ```
-> `-p` specifies path to store files
+> `-p` specifies path to store files; 
 > `-t` specifies number of threads (only for bowtie2).
 Create reference genome indexes
 
@@ -202,7 +203,7 @@ bicycle reference-index -p data/myproject -t 4
 ```
 
 Alignment 
-> `-p` specifies path to store files
+> `-p` specifies path to store files; 
 > `-t` specifies number of threads per sample and ref alignment.
 ```bash
 # Usage: bicycle [command] -p <project_path> -t <threads_per_sample>
@@ -210,8 +211,8 @@ bicycle align -p data/myproject -t 4
 ```
 
 Methylation calling and analysis
-> `-p` specifies path to store files
-> `-n` specifies number of threads to analyze
+> `-p` specifies path to store files; 
+> `-n` specifies number of threads to analyze; 
 > `-a` ignores reads aligned to both Watson and Crick strands.
 ```bash
 # Usage: bicycle [command] -p <project_path> -n <threads> [-a ignore double-aligned reads]
@@ -219,10 +220,10 @@ bicycle analyze-methylation -p data/myproject -n 4 -a
 ```
 
 Differential methylation analysis
-> `-p` specifies path to store files
-> `-t` specifies treatment-samples
-> `-c` specifis control-samples
-> `-x` specifies methylation context
+> `-p` specifies path to store files; 
+> `-t` specifies treatment-samples; 
+> `-c` specifis control-samples; 
+> `-x` specifies methylation context; 
 > `-b` specifies comma-separated (with no spaces) list of BED files to analyze at region-level.
 ```bash
 # Usage: bicycle [command] -p <project_path> -t <treatment_sample(s)> -c <control_sample(s)> -x <context> -b <BED_file>
