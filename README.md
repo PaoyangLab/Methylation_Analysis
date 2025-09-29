@@ -180,29 +180,30 @@ HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
 ```
 
 **bicycle** — end-to-end methylation + differential analysis   
-Create project
+- Create project
 > `-p` specifies path to store files; 
 > `-r` specifies directory with reference genomes; 
 > `-f` specifies directory with reads samples.
 ```bash
 # Usage: bicycle [command] -p <project_path> -r <reference_genome> -f <reads_directory> bicycle create-project -p data/myproject -r data/ref_genomes -f data/reads
 ```
-Create reference genomes
+
+- Create reference genomes
 > `-p` specifies path to store files.
 ```bash
 # Usage: bicycle [command] -p <project_path>
 bicycle reference-bisulfitation -p data/myproject
 ```
+
+- Create reference genome indexes
 > `-p` specifies path to store files; 
 > `-t` specifies number of threads (only for bowtie2).
-Create reference genome indexes
-
 ```bash
 # Usage: bicycle [command] -p <project_path> -t <threads>
 bicycle reference-index -p data/myproject -t 4
 ```
 
-Alignment 
+- Alignment 
 > `-p` specifies path to store files; 
 > `-t` specifies number of threads per sample and ref alignment.
 ```bash
@@ -210,7 +211,7 @@ Alignment
 bicycle align -p data/myproject -t 4
 ```
 
-Methylation calling and analysis
+- Methylation calling and analysis
 > `-p` specifies path to store files; 
 > `-n` specifies number of threads to analyze; 
 > `-a` ignores reads aligned to both Watson and Crick strands.
@@ -219,7 +220,7 @@ Methylation calling and analysis
 bicycle analyze-methylation -p data/myproject -n 4 -a
 ```
 
-Differential methylation analysis
+- Differential methylation analysis
 > `-p` specifies path to store files; 
 > `-t` specifies treatment-samples; 
 > `-c` specifis control-samples; 
@@ -500,7 +501,7 @@ MethylC-analyzer provides several post-alignment analyses. Here we provide comma
 ![methylC_tutorial.png](https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/methylC_tutorial.png)
 
 > All of the following command require the same input files with [Step 3.2.1](#321-searching-dmr), including CGmap files, `sample_list.txt` and `gene.gtf`.
-> The output figures are in the [Output figures](#figures) below
+> The figures of analysis results are  presented in the [Output](#figures) below
 
 #### 4.1 Heatmap & PCA Analysis
 ```bash
