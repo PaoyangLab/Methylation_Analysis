@@ -159,14 +159,16 @@ Rscript conversion_rate.R sample_lambda.CGmap.gz
 **MethylC‑analyzer (Docker)** 
 > Commands including: DMR, Heatmap_PCA, DMG, Fold_Enrichment, Metaplot, ChrView.
 
-> For DMR analysis, The default minimum depth for CpG sites and the number of sites within a region are both set to **4**. The default size of the DMR is **500 base pairs (bp)**. The default p-value cutoff for Student’s t-test for identifying DMRs is **P<0.05**. These arguments can be adjusted by users.
+> By default, the minimum read depth for CpG sites `-d` and the minimum number of qualified sites within a region `-q` are both set to **4**. The default size of the region for DMR serching `-r` is **500 base pairs (bp)**. To identify DMR, statistical significance is analyzed by Student’s t-test using a default p-value cutoff `-pvalue` of 0.05, and regions must also show an absolute average methylation difference `-dmrc` higher than 10% . These arguments can be adjusted by users.
 
-> The `-a` and `-b` specifies the group names. 
+> The flags `-a` and `-b` specify the two groups for differential methylation analysis and must match the labels used in the input file.
+
 ```bash
 # Usage: MethylC.py [command] <sample_list> <input_gtf_file> -a <group_a> -b <group_b>
 docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 \
   python /MethylC-analyzer/scripts/MethylC.py DMR samples_list.txt gene.gtf /app/ -a met1 -b wt
-
+```
+```bash
 ## Parameters
   -h, --help          show this help message and exit
   -a GROUP1           Name of group1
@@ -192,26 +194,29 @@ docker run --rm -v $(pwd):/app peiyulin/methylc:V1.0 \
 ```bash
 # HOME-pairwise -t <contexts> -i <sample_list.tsv> -o <out_dir> -mc <min_Cs> [--BSSeeker2]
 HOME-pairwise -t CG -i sample_file.tsv -o ./ -mc 4 --BSSeeker2
-
+```
+```bash
 ## Parameters
--sc --scorecutoff	0.1	the score from the classifier for each C position
--p --pruncutoff	0.1	the SVM score checked for consecutive Cs from both ends to refine the boundaries
--npp -–numprocess	8	number of cores to be used
--ml --minlength	50	minimum length of DMRs required to be reported
--ncb --numcb	5	minimum number of Cs present between DMRs to keep them seperate
--md -–mergedist	500	maximum distance allowed between DMRs to merge
--prn --prunningC	3	number of consecutives Cs to be considered for pruning for boundary refinement2
--ns --numsamples	all	no.of samples to use for DMR calling; default takes all sample in the file
--sp --startposition	1st position	start position of sample in the sample file to use for timeseries DMR calling
--BSSeeker2 --BSSeeker2	False	input CGmap file from BSSeeker2
--mc --minc	3	minimum number of Cs in a DMR
--sin --singlechrom	False	parallel code for single chromosome; npp will be used for parallel run for each chr
--d --delta	0.1	minimum average difference in methylation required in a DMR
--wrt --withrespectto	all	samples to use for DMR calling for pairwise comparisions with respect to specific samples
--Keepall --Keepall	False	Keep all cytosine positions present in atleast one of the replicate
+	-sc --scorecutoff	0.1	the score from the classifier for each C position
+	-p --pruncutoff	0.1	the SVM score checked for consecutive Cs from both ends to refine the boundaries
+	-npp -–numprocess	8	number of cores to be used
+	-ml --minlength	50	minimum length of DMRs required to be reported
+	-ncb --numcb	5	minimum number of Cs present between DMRs to keep them seperate
+	-md -–mergedist	500	maximum distance allowed between DMRs to merge
+	-prn --prunningC	3	number of consecutives Cs to be considered for pruning for boundary refinement2
+	-ns --numsamples	all	no.of samples to use for DMR calling; default takes all sample in the file
+	-sp --startposition	1st position	start position of sample in the sample file to use for timeseries DMR calling
+	-BSSeeker2 --BSSeeker2	False	input CGmap file from BSSeeker2
+	-mc --minc	3	minimum number of Cs in a DMR
+	-sin --singlechrom	False	parallel code for single chromosome; npp will be used for parallel run for each chr
+	-d --delta	0.1	minimum average difference in methylation required in a DMR
+	-wrt --withrespectto	all	samples to use for DMR calling for pairwise comparisions with respect to specific samples
+	-Keepall --Keepall	False	Keep all cytosine positions present in atleast one of the replicate
 ```
 
 **bicycle** — end-to-end methylation + differential analysis   
+> **NOTE:** The same parameter may be defined differently across different commands.
+
 - Create project
 > `-p` specifies path to store files; 
 > `-r` specifies directory with reference genomes; 
