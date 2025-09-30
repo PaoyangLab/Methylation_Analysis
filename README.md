@@ -41,6 +41,16 @@ The pipeline covers **read QC & trimming**, **alignment**, **methylation calling
 
 ### Environments & Requirements
 
+#### System Requirements
+- Linux/Unix or Mac OS platform
+- Python (Version 3.9 +)
+- R (Version 3.6 +)
+
+#### Hardware Requirements
+- A workstation with 8–16 CPU cores, 32–64 GB RAM, and at least 1.5 TB of storage.
+> Raw FASTQ files of Arabidopsis typically require 80–120 GB per sample, with BAM and CGmap outputs adding ~ 40–70 GB each.
+> A dataset of six samples usually needs ~1 TB total, allocating ≥2 TB (preferably SSD) ensures smooth analysis.
+
 #### Make a directory for pipeline test
 ```bash
 mkdir ~/test_methylation_analysis
