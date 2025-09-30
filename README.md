@@ -666,18 +666,21 @@ PCA
 ##### 4.2 DMG analysis
 
 Summary of dentifying Differentially Methylated Regions (DMRs) & Differentially Methylated Genes (DMGs)
+>  DMRs in promoters are typically associated with transcriptional activation or repression, while those in gene bodies relate to transcriptional stability and splicing. Similar numbers in both DMGs suggest that methylation changes have no preferences between promoter or gene body. 
 
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/Summary_DMR_DMG_numbers_CG_0.2.png" width="400">
 
 ##### 4.3 Enrichment analysis
 
 Genomic regions fold enrichment analysis for DMRs
+> DMRs exhibit a positive fold enrichment value in the IGR, suggesting a higher likelihood of DMRs being located in IGRs
 
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/CG_Fold_Enrichment.png" width="400">
 
 ##### 4.4 Metagene analysis
 
 The distribution of DNA methylation around gene body
+> The wt samples exhibit a standard CG methylation pattern with a lower methylation level at the transcription start site (TSS) and transcription end site (TES). The _met1_ samples show a consistently low methylation level along the gene body, reflecting the dysfunction of the methyltransferase
 
 <img src="https://github.com/PaoyangLab/Methylation_Analysis/blob/main/Figures/metaplot_CG.png" width="400">
 
